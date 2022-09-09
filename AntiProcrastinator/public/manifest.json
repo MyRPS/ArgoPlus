@@ -1,0 +1,26 @@
+{
+  "name": "Moot",
+  "version": "1.0.0",
+  "description": "Your AI Study Buddy",
+  "manifest_version": 3,
+  "author": "Mootbing",
+
+  "action":{
+    "default_popup": "index.html",
+    "default_title": "Moot",
+    "default_icon": {
+      "16": "images/16.png",
+      "24": "images/24.png",
+      "32": "images/32.png"
+    }
+  },
+
+  "permissions": [
+    "scripting", 
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "*://*/*"
+  ]
+}
