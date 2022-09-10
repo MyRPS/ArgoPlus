@@ -1,6 +1,7 @@
+
 const url = location.hostname;
 
-if (url === "www.youtube.com") {
+if (url === "www.youtube.com" || url === "www.tiktok.com") {
     const element = document.createElement("div");
     element.style.position = "fixed";
     element.style.top = "0";
