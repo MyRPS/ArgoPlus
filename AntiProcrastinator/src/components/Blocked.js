@@ -1,21 +1,95 @@
+import { useState } from "react";
+import Divider from "./Divider";
 
-import {useState} from 'react';
+export default function Blocked({
+  link = "https://youtube.com",
+  quote = "Bro stop slacking on YouTube smh...",
+  time = "10",
+}) {
+  const [open, setOpen] = useState(false);
 
-export default function Blocked() {
-    return (
-        <div className="Blocked" style={{display: "flex", height: "32px", width: "500px", backgroundColor: "#101010"}}>
-            <textarea 
-            style={{width: '100%', backgroundColor: '#303030', color: 'white', borderRadius: 0, border: "none", outline: "none", paddingLeft: 10}}
-            placeholder="Website Link To Block"
+  return (
+    <div style={{ paddingBottom: 5 }}>
+      <div
+        className="Blocked"
+        style={{
+          display: "flex",
+          height: "32px",
+          width: "100%",
+          backgroundColor: "#232323",
+        }}
+      >
+        <textarea
+          style={{
+            width: "100%",
+            backgroundColor: "#303030",
+            color: "#999",
+            borderBottomLeftRadius: open ? 0 : 5,
+            borderTopLeftRadius: 5,
+            border: "none",
+            outline: "none",
+            paddingLeft: 10,
+            resize: "none",
+          }}
+          value={link}
+          readOnly
+        />
+        <button
+          onClick={() => setOpen(!open)}
+          style={{
+            width: "40px",
+            backgroundColor: "#282828",
+            color: "#999",
+            borderTopRightRadius: 5,
+            borderBottomRightRadius: open ? 0 : 5,
+            border: "none",
+            outline: "none",
+            marginStart: 20,
+          }}
+        >
+          {open ? "-" : "+"}
+        </button>
+      </div>
+      {open && (
+        <center
+          style={{
+            backgroundColor: "#303030",
+            borderBottomRightRadius: 5,
+            borderBottomLeftRadius: 5,
+            padding: 15,
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ width: "100%" }}>
+            {quote && (
+              <>
+                <Divider text="Quote" />
+                <p style={{ color: "#999" }}> {quote}</p>
+              </>
+            )}
+            {time && (
+              <>
+                <Divider text="Limit" />
+                <p style={{ color: "#999" }}>{time} minutes / day</p>
+              </>
+            )}
+            <button
+              style={{
+                bottom: -15,
+                left: -30,
+                color: "#faa",
+                backgroundColor: "#CB4F4F",
+                position: "relative",
+                width: "325px",
+                border: 0,
+              }}
+              onClick={() => alert("Unblock")}
             >
-
-            </textarea>
-            {/* <button style={{width: '35px', backgroundColor: '#303030', color: 'red', borderRadius: 0, border: "none", outline: "none", marginStart: 20}}>
-            
-            </button> */}
-            <button style={{width: '70px', backgroundColor: '#282828', color: '#999', borderRadius: 0, border: "none", outline: "none", marginStart: 20}}>
-            Delete
+              Delete
             </button>
-        </div>
-    );
-}  
+          </div>
+        </center>
+      )}
+    </div>
+  );
+}
