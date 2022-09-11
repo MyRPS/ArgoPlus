@@ -2,9 +2,10 @@ import { useState } from "react";
 import Divider from "./Divider";
 
 export default function Blocked({
-  link = "https://youtube.com",
-  quote = "Bro stop slacking on YouTube smh...",
-  time = "10",
+  link = "",
+  quote = "",
+  time = "",
+  deleteCallback = null
 }) {
   const [open, setOpen] = useState(false);
 
@@ -83,7 +84,10 @@ export default function Blocked({
                 width: "325px",
                 border: 0,
               }}
-              onClick={() => alert("Unblock")}
+              onClick={() => {
+                if (deleteCallback) deleteCallback();
+                setOpen(false);
+              }}
             >
               Delete
             </button>

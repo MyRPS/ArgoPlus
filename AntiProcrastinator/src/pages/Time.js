@@ -8,18 +8,35 @@ export default function Time({}){
 
     const [blockedList, setBlockedList] = useState([]);
 
+    console.log("wtf")
     chrome.storage.sync.get(["blockedSites"], (result) => {
         
-        if (!result || !result.key)
+        console.log("getted: " + result);
+
+        if (!result || !result.blockedSites)
         {
             return;
         }
+
+        console.log("it not null: " + result.blockedSites);
         
-        setBlockedList(result.key);
-
-        console.log(result);
-
+        setBlockedList(result.blockedSites);
     });
+
+    const delSite = (index) => {
+
+        let newTasks = blockedList;
+
+        for (var i = 0; i < newTasks.length; i++)
+        {
+            if (i === index)
+            {
+                newTasks.splice(i, 1);
+            }
+        }
+
+        chrome.storage.sync.set({blockedSites: newTasks});
+    }
 
     return (
         <div style={{width: "100%", height: "100%", color: "#999" }}>
@@ -37,13 +54,14 @@ export default function Time({}){
                 overflowY: "scroll"
             }}
             >
-                {blockedList !== [] ? blockedList.map((site, index) => <p>{index}</p>) : <p>No restrictions yet...</p>}
+                {blockedList.length !== 0 ? blockedList.map((site, index) => <Blocked link={site.domain} quote={site.message} time={site.time} deleteCallback={() => delSite(index)}/>) : <p>No restrictions yet...</p>}
             </div>
 
             <Divider text="Add" />
 
             <div className="block-site-add">
             <textarea
+                id="motivating-note"
                 style={{
                 width: "100%",
                 height: "96px",
@@ -59,6 +77,7 @@ export default function Time({}){
             />
 
             <textarea
+                id="website-link"
                 style={{
                 width: "100%",
                 height: "32px",
@@ -74,6 +93,7 @@ export default function Time({}){
             />
 
             <textarea
+                id="time-limit"
                 style={{
                 width: "100%",
                 height: "32px",
@@ -101,11 +121,22 @@ export default function Time({}){
                 paddingBottom: 5,
                 }}
                 onClick={() => {
-                    chrome.storage.sync.set({blockedSites: [...blockedList, {
-                        message: "ahh be molotov",
-                        domain: "https://youtube.com",
-                        time: 10,
-                    }]});
+
+                    console.log("try to set");
+
+                    const toAdd = {
+                        message: document.getElementById("motivating-note").value,
+                        domain: document.getElementById("website-link").value,
+                        time: Number(document.getElementById("time-limit").value),
+                    };
+
+                    document.getElementById("motivating-note").value = "";
+                    document.getElementById("website-link").value = "";
+                    document.getElementById("time-limit").value = "";
+
+                    chrome.storage.sync.set({blockedSites: [...blockedList, toAdd]}, () => {
+                        console.log("setted to " + toAdd);
+                    });
                 }}
             >
                 Add Site Restriction
