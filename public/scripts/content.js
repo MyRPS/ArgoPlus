@@ -20,8 +20,8 @@ chrome.storage.sync.get(["blockedSites"], (result) => {
             element.style.left = "0";
             element.style.width = "100%";
             element.style.height = "100%";
-            element.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
-            element.style.backdropFilter = "blur(10px)";
+            element.style.backgroundColor = "rgb(0, 0, 0)";
+            // element.style.backdropFilter = "blur(100px)";
             element.style.zIndex = "100000000";
             element.style.paddingTop = "25px";
         
