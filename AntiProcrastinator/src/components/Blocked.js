@@ -21,6 +21,7 @@ export default function Blocked({
         }}
       >
         <textarea
+          className="top-no-bar"
           style={{
             width: "100%",
             backgroundColor: "#303030",
