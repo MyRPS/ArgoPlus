@@ -2,7 +2,7 @@
 
 console.log("Argo+: html script setup")
 
-const injectFinalGrade = (resultsDiv, finalGrade, className) => {
+const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades) => {
 
     while (resultsDiv.firstChild)
     {
@@ -10,20 +10,46 @@ const injectFinalGrade = (resultsDiv, finalGrade, className) => {
     }
 
     const resultThisAss = document.createElement("p");
-    resultThisAss.innerHTML = `${finalGrade}%`;
+    resultThisAss.innerHTML = `${Math.round(gotPoints / assignmentDetails["MaxPoints"] * 100 * 100) / 100}%`;
     resultThisAss.style.fontSize = "30px";
     resultThisAss.style.fontWeight = "bold";
 
     const resultThisAssSubtext = document.createElement("p");
     resultThisAssSubtext.innerHTML = "On this assignment";
 
+    let rawGotPoints = allGrades.map((val) => {return Number(val["Points"]);}).reduce((accumulator, value) => {
+        return accumulator + value;
+    }, 0);
+
+    let rawMaxPoints = allGrades.map((val) => {return Number(val["MaxPoints"]);}).reduce((accumulator, value) => {
+        return accumulator + value;
+    }, 0);
+
+    let weighted = false
+
+    for (var gradeStruct in allGrades)
+    {
+        if (gradeStruct["Weight"] != null)
+        {
+            weighted = true;
+        }
+    }
+
+    if (weighted)
+    {
+        alert("This assignment has weighted grades, which Argo+ does not (yet) support. The grade simulator will not work.");
+    }
+
+    rawGotPoints += Number(gotPoints);
+    rawMaxPoints += Number(assignmentDetails["MaxPoints"]);
+
     const resultOverall = document.createElement("p");
-    resultOverall.innerHTML = `WIP %`;
+    resultOverall.innerHTML = `${Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100}%`;
     resultOverall.style.fontSize = "30px";
     resultOverall.style.fontWeight = "bold";
 
     const resultOverallSubtext = document.createElement("p");
-    resultOverallSubtext.innerHTML = `In ${className}`;
+    resultOverallSubtext.innerHTML = `In ${assignmentDetails["SectionLinks"][0]["Section"]["Name"]} <br/> (${weighted ? "Weigthed Class" : "Unweighted Class"})`;
     
     resultsDiv.appendChild(resultThisAss);
     resultsDiv.appendChild(resultThisAssSubtext);
@@ -31,7 +57,7 @@ const injectFinalGrade = (resultsDiv, finalGrade, className) => {
     resultsDiv.appendChild(resultOverallSubtext);
 }
 
-const injectGradeSimulator = (assignmentDetail) => {
+const injectGradeSimulator = async (assignmentDetail) => {
     
     const injectionLocation = document.getElementsByClassName("bb-tile-content-section");
     let earnedGrade = document.getElementsByClassName("assignment-detail-status-label")[0];
@@ -49,6 +75,9 @@ const injectGradeSimulator = (assignmentDetail) => {
         return;
     }
 
+    const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
+    const allGrades = await fetch(`https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][0]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][0]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`).then(r => r.json()).then(result => {return result});
+
     const gradeSimulator = document.createElement("div");
     gradeSimulator.style.width = "100%";
     gradeSimulator.style.height = "100%";
@@ -62,7 +91,7 @@ const injectGradeSimulator = (assignmentDetail) => {
     gradeSimulator.className = "ArgoPlus-Display";
 
     const gradeSimulatorText = document.createElement("p");
-    gradeSimulatorText.innerHTML = "Grade Simulator (SUPER BETA)";
+    gradeSimulatorText.innerHTML = "Grade Simulator (SUPER EXPERIMENTAL)";
     gradeSimulatorText.style.display = "inline-block";
     gradeSimulatorText.style.marginLeft = "10px";
     gradeSimulatorText.style.marginRight = "10px";
@@ -84,10 +113,7 @@ const injectGradeSimulator = (assignmentDetail) => {
     gradeSimulatorInput.style.padding = "5px";
     gradeSimulatorInput.style.marginBottom = "5px";
     gradeSimulatorInput.onchange = () => {
-        const grade = gradeSimulatorInput.value;
-        const maxGrade = assignmentDetail["MaxPoints"];
-        const gradePercentage = (grade / maxGrade) * 100;
-        injectFinalGrade(resultsDiv, gradePercentage, assignmentDetail["SectionLinks"][0]["Section"]["Name"]);
+        injectFinalGrade(resultsDiv, gradeSimulatorInput.value, assignmentDetail, allGrades);
     }
 
     const gradeSimulatorInputSubtext = document.createElement("p");
@@ -97,17 +123,6 @@ const injectGradeSimulator = (assignmentDetail) => {
     gradeSimulatorInputSubtext.style.marginInlineStart = "5px";
     gradeSimulatorInputSubtext.style.fontSize = "20px";
 
-    // const gradeSimulatorButton = document.createElement("button");
-    // gradeSimulatorButton.innerHTML = "Calculate";
-    // gradeSimulatorButton.style.width = "300px";
-    // gradeSimulatorButton.style.padding = "5px";
-    // gradeSimulatorButton.style.border = "none";
-    // gradeSimulatorButton.style.backgroundColor = "#707070";
-    // gradeSimulatorButton.style.color = "#fff";
-    // gradeSimulatorButton.style.borderRadius = "25px";
-    // gradeSimulatorButton.style.height = 50;
-    // gradeSimulatorButton.onclick
-
     gradeSimulator.appendChild(gradeSimulatorText);
     gradeSimulator.appendChild(gradeSimulatorInput);
     gradeSimulator.appendChild(gradeSimulatorInputSubtext);
@@ -116,7 +131,7 @@ const injectGradeSimulator = (assignmentDetail) => {
 
     injectionLocation[1].appendChild(gradeSimulator);
 
-    injectFinalGrade(resultsDiv, 100, assignmentDetail["SectionLinks"][0]["Section"]["Name"]);
+    injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades);
 }
 
 const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = "", fontColor = "#fff") => {
@@ -231,6 +246,11 @@ const checkForAssDetailUrl = async (request) => {
         injectDisplay("Due " + assignmentDetail["SectionLinks"][0]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][0]["DueTime"], "#7368bc");
 
         injectDisplay(assignmentDetail["MaxPoints"] > 0 ? assignmentDetail["MaxPoints"] + " Points" : "No Grade (0 Points)", "#71BC68");
+        
+        if (assignmentDetail["Factor"] > 1)
+        {
+            injectDisplay("Weight Factor: " + assignmentDetail["Factor"], "#71BC68");
+        }
 
         if (assignmentDetail["DownloadItems"].length > 0)
         {
