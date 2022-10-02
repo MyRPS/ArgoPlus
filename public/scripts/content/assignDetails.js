@@ -2,7 +2,7 @@
 
 console.log("Argo+: html script setup")
 
-const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades) => {
+const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades, classIndex) => {
 
     while (resultsDiv.firstChild)
     {
@@ -49,7 +49,7 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades) =
     resultOverall.style.fontWeight = "bold";
 
     const resultOverallSubtext = document.createElement("p");
-    resultOverallSubtext.innerHTML = `In ${assignmentDetails["SectionLinks"][0]["Section"]["Name"]} <br/> (${weighted ? "Weigthed Class" : "Unweighted Class"})`;
+    resultOverallSubtext.innerHTML = `In ${assignmentDetails["SectionLinks"][classIndex]["Section"]["Name"]} <br/> (${weighted ? "Weigthed Class" : "Unweighted Class"})`;
     
     resultsDiv.appendChild(resultThisAss);
     resultsDiv.appendChild(resultThisAssSubtext);
@@ -57,14 +57,14 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades) =
     resultsDiv.appendChild(resultOverallSubtext);
 }
 
-const injectGradeSimulator = async (assignmentDetail) => {
+const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     
     const injectionLocation = document.getElementsByClassName("bb-tile-content-section");
     let earnedGrade = document.getElementsByClassName("assignment-detail-status-label")[0];
 
     if (injectionLocation.length === 0 || earnedGrade === undefined || injectionLocation[0] === undefined)
     {
-        setTimeout(() => {injectGradeSimulator(assignmentDetail)}, 500);
+        setTimeout(() => {injectGradeSimulator(assignmentDetail, classIndex)}, 500);
         return;
     }
 
@@ -76,7 +76,7 @@ const injectGradeSimulator = async (assignmentDetail) => {
     }
 
     const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
-    const allGrades = await fetch(`https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][0]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][0]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`).then(r => r.json()).then(result => {return result});
+    const allGrades = await fetch(`https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][classIndex]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`).then(r => r.json()).then(result => {return result});
 
     const gradeSimulator = document.createElement("div");
     gradeSimulator.style.width = "100%";
@@ -113,7 +113,7 @@ const injectGradeSimulator = async (assignmentDetail) => {
     gradeSimulatorInput.style.padding = "5px";
     gradeSimulatorInput.style.marginBottom = "5px";
     gradeSimulatorInput.onchange = () => {
-        injectFinalGrade(resultsDiv, gradeSimulatorInput.value, assignmentDetail, allGrades);
+        injectFinalGrade(resultsDiv, gradeSimulatorInput.value, assignmentDetail, allGrades, classIndex);
     }
 
     const gradeSimulatorInputSubtext = document.createElement("p");
@@ -131,7 +131,7 @@ const injectGradeSimulator = async (assignmentDetail) => {
 
     injectionLocation[1].appendChild(gradeSimulator);
 
-    injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades);
+    injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades, classIndex);
 }
 
 const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = "", fontColor = "#fff") => {
@@ -214,6 +214,12 @@ const fetchAssignmentDetailXHR = async (assignmentID) => {
     return assignmentDetail;
 }
 
+
+
+
+
+
+// code to check url then inject
 const checkForAssDetailUrl = async (request) => {
     // console.log("argoplus: recieve message to content script w/ " + request.url);
 
@@ -222,15 +228,28 @@ const checkForAssDetailUrl = async (request) => {
     if (request.url.includes(baseURL))
     {
         console.log("ArgoPlus: Assignment Details Page Detected");
-        const assignmentDetail = await fetchAssignmentDetailXHR(request.url.match("/[0-9]+?/")[0].replaceAll("/", ""));
         
-        // for (var key of Object.keys(assignmentDetail))
-        // {
-        //     injectDisplay(key + ": " + assignmentDetail[key]);
-        // }
+        const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
+        const assignmentIndexId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[1];
+
+        // console.log(assignmentId + " and " + assignmentIndexId);
+
+        const assignmentDetail = await fetchAssignmentDetailXHR(assignmentId);
+
+        var classIndex = 0;
+        for (; classIndex < assignmentDetail["SectionLinks"].length; classIndex++)
+        {
+            if (assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"] == assignmentIndexId)
+            {
+                // console.log("match at " + classIndex);
+                break;
+            }
+        }
+
+        // console.log("classIndex: " + classIndex);
         
         injectDisplay(assignmentDetail["ShortDescription"], "#fff", true, false, "", "#272727");
-        injectDisplay(assignmentDetail["SectionLinks"][0]["Section"]["Name"], "#fff", false, false, "", "#707070")
+        injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, "", "#707070")
         injectDisplay(assignmentDetail["LongDescription"], "#fff", false, false, "", "#272727");
 
         injectDisplay("Tags (Beta): ", "#fff", true, false, "", "#272727");
@@ -242,8 +261,8 @@ const checkForAssDetailUrl = async (request) => {
             injectDisplay("Resubmittable Until Deadline", "#2DC8D0");
         }
 
-        injectDisplay("Posted " + assignmentDetail["SectionLinks"][0]["AssignmentDate"], "#7368bc");
-        injectDisplay("Due " + assignmentDetail["SectionLinks"][0]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][0]["DueTime"], "#7368bc");
+        injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
+        injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");
 
         injectDisplay(assignmentDetail["MaxPoints"] > 0 ? assignmentDetail["MaxPoints"] + " Points" : "No Grade (0 Points)", "#71BC68");
         
@@ -272,7 +291,7 @@ const checkForAssDetailUrl = async (request) => {
             }
         }
 
-        injectGradeSimulator(assignmentDetail);
+        injectGradeSimulator(assignmentDetail, classIndex);
     }
 }
 
