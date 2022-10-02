@@ -1,6 +1,6 @@
 # ArgoPlus - The Argonet extender application
 
-![image](https://user-images.githubusercontent.com/50122069/193460494-150fdce7-6a5e-4098-80f2-708da9bcb0b5.png)
+![image](https://user-images.githubusercontent.com/50122069/193476911-dff58436-3ccb-45eb-8453-8310e36c69fe.png)
 
 New features built upon Argonet:
 * Grade Simulator
