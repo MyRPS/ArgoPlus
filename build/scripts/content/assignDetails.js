@@ -68,14 +68,22 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
         return;
     }
 
-    earnedGrade = earnedGrade.innerHTML;
+    const earnedGradeText = earnedGrade.innerHTML;
 
-    if (earnedGrade.includes("Graded:") || assignmentDetail["MaxPoints"] === 0)
+    if (earnedGradeText.includes("Graded:") || assignmentDetail["MaxPoints"] === 0)
     {
         return;
     }
 
     const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
+
+    if (earnedGradeText.includes("Graded"))
+    {
+        const gradeLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
+        earnedGrade.innerHTML = `Graded <a href="${gradeLink}" target="_blank">Click to check.</a>`;
+        return;
+    }
+
     const allGrades = await fetch(`https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][classIndex]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`).then(r => r.json()).then(result => {return result});
 
     const gradeSimulator = document.createElement("div");
@@ -232,7 +240,7 @@ const checkForAssDetailUrl = async (request) => {
         const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
         const assignmentIndexId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[1];
 
-        console.log(assignmentId + " and " + assignmentIndexId);
+        // console.log(assignmentId + " and " + assignmentIndexId);
 
         const assignmentDetail = await fetchAssignmentDetailXHR(assignmentId);
 
@@ -241,12 +249,12 @@ const checkForAssDetailUrl = async (request) => {
         {
             if (assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"] == assignmentIndexId)
             {
-                console.log("match at " + classIndex);
+                // console.log("match at " + classIndex);
                 break;
             }
         }
 
-        console.log("classIndex: " + classIndex);
+        // console.log("classIndex: " + classIndex);
         
         injectDisplay(assignmentDetail["ShortDescription"], "#fff", true, false, "", "#272727");
         injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, "", "#707070")

@@ -68,14 +68,22 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
         return;
     }
 
-    earnedGrade = earnedGrade.innerHTML;
+    const earnedGradeText = earnedGrade.innerHTML;
 
-    if (earnedGrade.includes("Graded:") || assignmentDetail["MaxPoints"] === 0)
+    if (earnedGradeText.includes("Graded:") || assignmentDetail["MaxPoints"] === 0)
     {
         return;
     }
 
     const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
+
+    if (earnedGradeText.includes("Graded"))
+    {
+        const gradeLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
+        earnedGrade.innerHTML = `Graded <a href="${gradeLink}" target="_blank">Click to check.</a>`;
+        return;
+    }
+
     const allGrades = await fetch(`https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][classIndex]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`).then(r => r.json()).then(result => {return result});
 
     const gradeSimulator = document.createElement("div");
