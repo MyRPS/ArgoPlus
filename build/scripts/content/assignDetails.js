@@ -15,7 +15,7 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades) =
     resultThisAss.style.fontWeight = "bold";
 
     const resultThisAssSubtext = document.createElement("p");
-    resultThisAssSubtext.innerHTML = "On this assignment";
+    resultThisAssSubtext.innerHTML = `On ${assignmentDetails["ShortDescription"]}`;
 
     let rawGotPoints = allGrades.map((val) => {return Number(val["Points"]);}).reduce((accumulator, value) => {
         return accumulator + value;
