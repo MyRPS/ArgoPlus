@@ -166,13 +166,13 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades, classIndex);
 }
 
-const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = "", fontColor = "#fff") => {
+const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = "", fontColor = "#fff", onOther = false) => {
 
     const injectionLocation = document.getElementsByClassName("bb-tile-content-section");
 
-    if (injectionLocation.length === 0 || injectionLocation[0] === undefined)
+    if (injectionLocation.length === 0 || injectionLocation[0] === undefined || injectionLocation[1] === undefined)
     {
-        setTimeout(() => {injectDisplay(label, color, isHeader, showBeta, URL, fontColor)}, 500);
+        setTimeout(() => {injectDisplay(label, color, isHeader, showBeta, URL, fontColor, onOther)}, 500);
         return;
     }
 
@@ -201,6 +201,9 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
     if (URL !== "")
     {
         pointDisplayText.href = URL;
+        pointDisplayText.target = "_blank";
+        pointDisplayText.style.paddingTop = "7px";
+        pointDisplayText.style.paddingBottom = "7px";
         // pointDisplayText.style.textDecoration = "none";
     }
 
@@ -221,20 +224,23 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
     }
 
     //inject
-    while (injectionLocation[0].firstChild) {
+    if (!onOther)
+    {
+        while (injectionLocation[0].firstChild) {
 
-        const className = injectionLocation[0].firstChild.className;
-        const id = injectionLocation[0].firstChild.id;
+            const className = injectionLocation[0].firstChild.className;
+            const id = injectionLocation[0].firstChild.id;
 
-        if (className === "ArgoPlus-Display") // || id === "assignment-detail-linked-content")
-        {
-            break;
+            if (className === "ArgoPlus-Display") // || id === "assignment-detail-linked-content")
+            {
+                break;
+            }
+
+            injectionLocation[0].removeChild(injectionLocation[0].firstChild);
         }
-
-        injectionLocation[0].removeChild(injectionLocation[0].firstChild);
     }
     
-    injectionLocation[0].appendChild(pointDisplay)
+    injectionLocation[onOther ? 1 : 0].appendChild(pointDisplay)
 }
 
 const fetchAssignmentDetailXHR = async (assignmentID) => {
@@ -284,7 +290,28 @@ const checkForAssDetailUrl = async (request) => {
         injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, "", "#707070")
         injectDisplay(assignmentDetail["LongDescription"], "#fff", false, false, "", "#272727");
 
-        // injectDisplay("Tags (Beta): ", "#fff", true, false, "", "#272727");
+        if (assignmentDetail["LinkItems"].length > 0 || assignmentDetail["DownloadItems"].length > 0)
+        {
+            injectDisplay("Attachments:", "#fff", true, false, "", "#272727", true);
+        }
+
+        if (assignmentDetail["DownloadItems"].length > 0)
+        {
+            for (var downloadKey of assignmentDetail["DownloadItems"])
+            {
+                injectDisplay(downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", true);
+            }
+        }
+
+        if (assignmentDetail["LinkItems"].length > 0)
+        {
+            for (var linkKey of assignmentDetail["LinkItems"])
+            {
+                injectDisplay(linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", true);
+            }
+        }
+
+        //tags
 
         injectDisplay("Assignment Type: " + assignmentDetail["AssignmentType"] , "#2DC8D0");
 
@@ -296,31 +323,11 @@ const checkForAssDetailUrl = async (request) => {
         injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
         injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");
 
-        // injectDisplay(assignmentDetail["MaxPoints"] > 0 ? assignmentDetail["MaxPoints"] + " Points" : "No Grade (0 Points)", "#71BC68");
+        injectDisplay(assignmentDetail["MaxPoints"] > 0 ? assignmentDetail["MaxPoints"] + " Points" : "No Grade (0 Points)", "#71BC68", false, true, "", "#fff", true);
         
         if (assignmentDetail["Factor"] > 1)
         {
-            injectDisplay("Weight Factor: " + assignmentDetail["Factor"], "#71BC68");
-        }
-
-        if (assignmentDetail["DownloadItems"].length > 0)
-        {
-            injectDisplay("Downloads: ", "#fff", true, false, "", "#272727");
-
-            for (var downloadKey of assignmentDetail["DownloadItems"])
-            {
-                injectDisplay(downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#EEE", false, false, downloadKey["DownloadUrl"]);
-            }
-        }
-
-        if (assignmentDetail["LinkItems"].length > 0)
-        {
-            injectDisplay("Links: ", "#fff", true, false, "", "#272727");
-
-            for (var linkKey of assignmentDetail["LinkItems"])
-            {
-                injectDisplay(linkKey["ShortDescription"], "#EEE", false, false, linkKey["Url"]);
-            }
+            injectDisplay("Weight Factor: " + assignmentDetail["Factor"], "#71BC68", false, true, "", "#fff", true);
         }
 
         injectGradeSimulator(assignmentDetail, classIndex);
