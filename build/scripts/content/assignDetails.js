@@ -70,17 +70,15 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
 
     const earnedGradeText = earnedGrade.innerHTML;
 
-    if (earnedGradeText.includes("Graded:") || assignmentDetail["MaxPoints"] === 0)
-    {
-        return;
-    }
-
     const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
 
-    if (earnedGradeText.includes("Graded"))
+    if (earnedGradeText.includes("Graded") || assignmentDetail["MaxPoints"] === 0)
     {
         const gradeLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
-        earnedGrade.innerHTML = `Graded <a href="${gradeLink}" target="_blank">Click to check.</a>`;
+
+        const grade = await fetch(gradeLink).then(r => r.json()).then(result => {return result[0]["pointsEarned"]});
+
+        earnedGrade.innerHTML = `Graded: ${grade} of ${assignmentDetail["MaxPoints"]} (${Math.round(grade / assignmentDetail["MaxPoints"] * 100 * 100) / 100}%)`;
         return;
     }
 
