@@ -17,3 +17,7 @@ By downloading the extension, you agree and acknowlege to the following Privacy 
 
 2. ### **I, the consumer of this product, will not hold the developer(s) of ArgoPlus accountable for any misinformation.** 
 * Everything is a beta, and is subject to change. Do not kill us if your grade is not right, we're working on it.
+
+# Installation Instructions
+
+https://www.youtube.com/watch?v=H02diCTsGCs
