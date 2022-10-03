@@ -79,6 +79,12 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
 
     if (earnedGradeText.includes("Graded"))
     {
+
+        if (!earnedGradeText.includes("of"))
+        {
+            return;
+        }
+
         const gradeLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
 
         const grade = await fetch(gradeLink).then(r => r.json()).then(result => {return result[0]["pointsEarned"]});
