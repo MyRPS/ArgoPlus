@@ -12,7 +12,7 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades, c
     const resultThisAss = document.createElement("p");
     resultThisAss.innerHTML = `${Math.round(gotPoints / assignmentDetails["MaxPoints"] * 100 * 100) / 100}%`;
     resultThisAss.style.fontSize = "30px";
-    resultThisAss.style.fontWeight = "bold";
+    resultThisAss.style.fontWeight = "regular";
 
     const resultThisAssSubtext = document.createElement("p");
     resultThisAssSubtext.innerHTML = `On ${assignmentDetails["ShortDescription"]}`;
@@ -40,16 +40,16 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetails, allGrades, c
         alert("This assignment has weighted grades, which Argo+ does not (yet) support. The grade simulator will not work.");
     }
 
-    rawGotPoints += Number(gotPoints);
-    rawMaxPoints += Number(assignmentDetails["MaxPoints"]);
+    const experimentalGotPoints = rawGotPoints + Number(gotPoints);
+    const experimentalMaxPoints = rawMaxPoints + Number(assignmentDetails["MaxPoints"]);
 
     const resultOverall = document.createElement("p");
-    resultOverall.innerHTML = `${Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100}%`;
+    resultOverall.innerHTML = `${Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100}% -> ${Math.round((experimentalGotPoints/experimentalMaxPoints * 100) * 100) / 100}%`;
     resultOverall.style.fontSize = "30px";
-    resultOverall.style.fontWeight = "bold";
+    resultOverall.style.fontWeight = "regular";
 
     const resultOverallSubtext = document.createElement("p");
-    resultOverallSubtext.innerHTML = `In ${assignmentDetails["SectionLinks"][classIndex]["Section"]["Name"]} <br/> (${weighted ? "Weigthed Class" : "Unweighted Class"})`;
+    resultOverallSubtext.innerHTML = `In ${assignmentDetails["SectionLinks"][classIndex]["Section"]["Name"]} (Before & After) <br/> (${weighted ? "Weigthed Class" : "Unweighted Class"})`;
     
     resultsDiv.appendChild(resultThisAss);
     resultsDiv.appendChild(resultThisAssSubtext);
