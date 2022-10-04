@@ -23,7 +23,11 @@
       "matches": [
         "*://*/*"
       ],
-      "js": ["scripts/content/assignDetails.js"]
+      "js": [
+        "scripts/content/router.js",
+        "scripts/content/mail.js",
+        "scripts/content/assignDetails.js"
+      ]
     }
   ],
 

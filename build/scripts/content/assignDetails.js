@@ -266,13 +266,13 @@ const fetchAssignmentDetailXHR = async (assignmentID) => {
 
 
 // code to check url then inject
-const checkForAssDetailUrl = async (request) => {
+const injectAssignmentDetail = async (request) => {
     // console.log("argoplus: recieve message to content script w/ " + request.url);
 
-    const baseURL = "https://rutgersprep.myschoolapp.com/app/student#assignmentdetail/";
+    // const baseURL = "https://rutgersprep.myschoolapp.com/app/student#assignmentdetail/";
 
-    if (request.url.includes(baseURL))
-    {
+    // if (request.url.includes(baseURL))
+    // {
         console.log("ArgoPlus: Assignment Details Page Detected");
         
         const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
@@ -302,7 +302,7 @@ const checkForAssDetailUrl = async (request) => {
         {
             for (var downloadKey of assignmentDetail["DownloadItems"])
             {
-                injectDisplay("🔗" + downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", false);
+                injectDisplay("📥 " + downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", false);
             }
         }
 
@@ -310,7 +310,7 @@ const checkForAssDetailUrl = async (request) => {
         {
             for (var linkKey of assignmentDetail["LinkItems"])
             {
-                injectDisplay("⬇️" + linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", false);
+                injectDisplay("🔗 " + linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", false);
             }
         }
 
@@ -342,8 +342,10 @@ const checkForAssDetailUrl = async (request) => {
         }
 
         injectGradeSimulator(assignmentDetail, classIndex);
-    }
+    // }
 }
 
-chrome.runtime.onMessage.addListener(checkForAssDetailUrl);
-checkForAssDetailUrl({url: location.href});
+// chrome.runtime.onMessage.addListener(checkForAssDetailUrl);
+// checkForAssDetailUrl({url: location.href});
+
+// export default injectAssignmentDetail;
