@@ -115,7 +115,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     gradeSimulator.className = "ArgoPlus-Display";
 
     const gradeSimulatorText = document.createElement("p");
-    gradeSimulatorText.innerHTML = "Grade Simulator (WIP) <br/>";
+    gradeSimulatorText.innerHTML = "Score+";
     // gradeSimulatorText.style.display = "inline-block";
     gradeSimulatorText.style.marginLeft = "10px";
     gradeSimulatorText.style.marginRight = "10px";
@@ -123,7 +123,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     gradeSimulatorText.style.fontWeight = "bold";
 
     const gradeSimulatorSubText = document.createElement("p");
-    gradeSimulatorSubText.innerHTML = "Enter your grade here to calculate your final score in this class and the assignment.";
+    gradeSimulatorSubText.innerHTML = "Enter your grade here to calculate your final score in this class and the assignment. Heavy WIP and not 100% accurate.";
     gradeSimulatorSubText.style.marginLeft = "10px";
     gradeSimulatorSubText.style.marginRight = "10px";
     gradeSimulatorSubText.style.color = "#707070";
@@ -139,10 +139,11 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     gradeSimulatorInput.max = assignmentDetail["MaxPoints"];
     gradeSimulatorInput.min = "0";
     gradeSimulatorInput.value = assignmentDetail["MaxPoints"];
-    gradeSimulatorInput.style.width = "100px";
+    gradeSimulatorInput.style.width = "50px";
     gradeSimulatorInput.style.alignContent = "end";
     gradeSimulatorInput.style.height = 50;
-    gradeSimulatorInput.style.borderColor = "#DFDFDF";
+    gradeSimulatorInput.style.backgroundColor = "#EFEFEF";
+    gradeSimulatorInput.style.border = "none";
     gradeSimulatorInput.style.borderRadius = "5px";
     gradeSimulatorInput.style.fontSize = "20px";
     // gradeSimulatorInput.style.padding = "5px";
@@ -153,16 +154,17 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     }
 
     const gradeSimulatorInputSubtext = document.createElement("p");
-    gradeSimulatorInputSubtext.innerHTML = "/ " + assignmentDetail["MaxPoints"];
+    gradeSimulatorInputSubtext.innerHTML = "/ " + assignmentDetail["MaxPoints"] + " (Max)";
     gradeSimulatorInputSubtext.width = "50px";
     gradeSimulatorInputSubtext.style.display = "inline-block";
     gradeSimulatorInputSubtext.style.marginInlineStart = "5px";
     gradeSimulatorInputSubtext.style.fontSize = "20px";
 
-    gradeSimulator.appendChild(gradeSimulatorText);
-    gradeSimulator.appendChild(gradeSimulatorSubText);
+    // gradeSimulator.appendChild(divider);
+    // gradeSimulator.appendChild(gradeSimulatorText);
     gradeSimulator.appendChild(gradeSimulatorInput);
     gradeSimulator.appendChild(gradeSimulatorInputSubtext);
+    gradeSimulator.appendChild(gradeSimulatorSubText);
     // gradeSimulator.appendChild(gradeSimulatorButton);
     gradeSimulator.appendChild(divider);
     gradeSimulator.appendChild(resultsDiv);
@@ -296,16 +298,11 @@ const checkForAssDetailUrl = async (request) => {
         injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, `https://rutgersprep.myschoolapp.com/app/student#academicclass/${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}/0/bulletinboard`, "#707070")
         injectDisplay(assignmentDetail["LongDescription"], "#fff", false, false, "", "#272727");
 
-        if (assignmentDetail["LinkItems"].length > 0 || assignmentDetail["DownloadItems"].length > 0)
-        {
-            injectDisplay("Attachments:", "#fff", true, false, "", "#272727", true);
-        }
-
         if (assignmentDetail["DownloadItems"].length > 0)
         {
             for (var downloadKey of assignmentDetail["DownloadItems"])
             {
-                injectDisplay(downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", true);
+                injectDisplay("🔗" + downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", false);
             }
         }
 
@@ -313,9 +310,14 @@ const checkForAssDetailUrl = async (request) => {
         {
             for (var linkKey of assignmentDetail["LinkItems"])
             {
-                injectDisplay(linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", true);
+                injectDisplay("⬇️" + linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", false);
             }
         }
+
+        // if (assignmentDetail["LinkItems"].length > 0 || assignmentDetail["DownloadItems"].length > 0)
+        // {
+        //     injectDisplay("Attachments:", "#fff", true, false, "", "#272727", true);
+        // }
 
         //tags
 
@@ -329,7 +331,10 @@ const checkForAssDetailUrl = async (request) => {
         injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
         injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");
 
-        injectDisplay(assignmentDetail["MaxPoints"] > 0 ? assignmentDetail["MaxPoints"] + " Points" : "No Grade (0 Points)", "#71BC68", false, true, "", "#fff", true);
+        if (assignmentDetail["MaxPoints"] === 0)
+        {
+            injectDisplay("Ungraded (0 Points)", "#71BC68", false, true, "", "#fff", true);
+        }
         
         if (assignmentDetail["Factor"] > 1)
         {

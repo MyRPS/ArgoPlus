@@ -9,8 +9,8 @@ import Analytics from "./pages/Analytics";
 
 function App() {
   return (
-    <div style={{width: 50, height: 50}}>
-      Status: Ok
+    <div style={{width: 250, height: 250}}>
+      Argo+ - Dashboard
     </div>
   );
 }
