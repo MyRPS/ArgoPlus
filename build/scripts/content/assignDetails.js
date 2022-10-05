@@ -144,7 +144,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
 
     const resultsDiv = document.createElement("details");
     resultsDiv.style.paddingTop = "10px";
-    resultsDiv.innerText = "See Grade";
+    resultsDiv.innerHTML = "<summary>See Grade</summary>";
     resultsDiv.style.paddingBottom = "10px";
 
     const gradeSimulatorInput = document.createElement("input");
