@@ -65,6 +65,7 @@ const injectMail = async (request) => {
     }
     allAsRead.style.marginLeft = "5px";
     allAsRead.style.marginRight = "5px";
+    allAsRead.style.display = "inline-block";
     // allAsRead.style.backgroundColor = "#fff";
     // allAsRead.style.border = "1px solid #ccc";
     // allAsRead.style.borderRadius = "4px";
@@ -79,6 +80,7 @@ const injectMail = async (request) => {
     }
     allAsArchive.style.marginLeft = "10px";
     allAsArchive.style.marginRight = "10px";
+    allAsArchive.style.display = "inline-block";
     // allAsArchive.style.backgroundColor = "#fff";
     // allAsArchive.style.border = "1px solid #ccc";
     // allAsArchive.style.borderRadius = "4px";
@@ -86,6 +88,6 @@ const injectMail = async (request) => {
     // allAsArchive.style.fontSize = "13px";
     allAsArchive.className = "btn bb-btn-secondary btn-sm";
 
-    actionBar.appendChild(allAsRead);
     actionBar.appendChild(allAsArchive);
+    actionBar.appendChild(allAsRead);
 }

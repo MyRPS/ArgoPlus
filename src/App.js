@@ -28,10 +28,23 @@ const Classes = () => {
   <>
     <ClassDetail />
     <details>
-      <summary style={{listStyle: "none"}}><u>Show More</u></summary>
+      <summary style={{listStyle: "none", fontSize: 12}}><u>Show More</u></summary>
       {Array(5).fill(<ClassDetail />)}
     </details>
   </>)
+}
+
+const Lunch = () => {
+
+  const [menu, setMenuItems] = useState(null);
+
+  fetch(`https://www.sagedining.com/microsites/getMenuItems?menuId=113592&date=${new Date().toISOString().split("T")[0]}&meal=Lunch `).then(res => res.json()).then(data => {
+    setMenuItems(data);
+  });
+  
+  return (
+    
+  );
 }
 
 function App() {
@@ -39,12 +52,13 @@ function App() {
     <div style={{width: "300px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
       <h1>Dashboard</h1>
       <Divider />
-      <p>School day's over, what you see is for tomorrow. <a href={""}>See today.</a></p>
+      <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p>
       <h4>Next Up</h4>
       <Divider />
       <Classes />
       <h4>Lunch</h4>
       <Divider />
+      <Lunch />
     </div>
   );
 }
