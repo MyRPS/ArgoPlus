@@ -1,6 +1,4 @@
-/* global chrome, location */
-
-// import injectAssignmentDetail from "./assignmentDetail";
+/* global chrome, location*/
 
 const matchURLs = async (request) => {
     // console.log("argoplus: recieve message to content script w/ " + request.url);

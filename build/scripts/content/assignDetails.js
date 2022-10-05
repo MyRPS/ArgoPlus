@@ -2,7 +2,7 @@
 
 console.log("Argo+: html script setup")
 
-const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, classIndex) => {
+const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, classIndex, realClassAvg) => {
 
     while (resultsDiv.firstChild)
     {
@@ -29,8 +29,15 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, cl
     const experimentalGotPoints = rawGotPoints + Number(gotPoints);
     const experimentalMaxPoints = rawMaxPoints + Number(assignmentDetail["MaxPoints"]);
 
+    const before = Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100;
+    
+    if (before != realClassAvg)
+    {
+        injectDisplay(`Your current real class average (${realClassAvg}%) doesn't match up with our algorithm. Please use the prediction with a grain of salt.`, "#ffaaaf", false, false, "", "#fff", true);
+    }
+
     const resultOverall = document.createElement("p");
-    resultOverall.innerHTML = `${Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100}% -> ${Math.round((experimentalGotPoints/experimentalMaxPoints * 100) * 100) / 100}%`;
+    resultOverall.innerHTML = `${before}% -> ${Math.round((experimentalGotPoints/experimentalMaxPoints * 100) * 100) / 100}%`;
     resultOverall.style.fontSize = "30px";
     resultOverall.style.fontWeight = "regular";
 
@@ -69,10 +76,14 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     const allGrades = await fetch(gradeURL).then(r => r.json()).then(result => {return result});
 
     let weighted = null
+    let realClassAvg = null;
 
     for (var gradeStruct in allGrades)
     {
         const curStruct = allGrades[gradeStruct]
+
+        realClassAvg = curStruct["SectionGrade"];
+
         if (curStruct["Weight"] != null && curStruct["AssignmentId"] === assignmentDetail["AssignmentId"])
         {
             // console.log("weight " + curStruct["Weight"])
@@ -150,7 +161,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     gradeSimulatorInput.style.marginTop = "15px";
     gradeSimulatorInput.style.marginBottom = "15px";
     gradeSimulatorInput.onchange = () => {
-        injectFinalGrade(resultsDiv, gradeSimulatorInput.value, assignmentDetail, allGrades, classIndex);
+        injectFinalGrade(resultsDiv, gradeSimulatorInput.value, assignmentDetail, allGrades, classIndex, realClassAvg);
     }
 
     const gradeSimulatorInputSubtext = document.createElement("p");
@@ -171,7 +182,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
 
     injectionLocation[1].appendChild(gradeSimulator);
 
-    injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades, classIndex);
+    injectFinalGrade(resultsDiv, assignmentDetail["MaxPoints"], assignmentDetail, allGrades, classIndex, realClassAvg);
 }
 
 const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = "", fontColor = "#fff", onOther = false) => {
@@ -323,10 +334,7 @@ const injectAssignmentDetail = async (request) => {
 
         injectDisplay("Assignment Type: " + assignmentDetail["AssignmentType"] , "#2DC8D0");
 
-        if (assignmentDetail["DropboxResub"])
-        {
-            injectDisplay("Resubmittable Until Deadline", "#2DC8D0");
-        }
+        injectDisplay(assignmentDetail["DropboxResub"] ? "Resubmittable Until Deadline" : "No Resubmittions Allowed", "#2DC8D0");
 
         injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
         injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");

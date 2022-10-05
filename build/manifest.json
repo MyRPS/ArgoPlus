@@ -24,9 +24,9 @@
         "*://*/*"
       ],
       "js": [
-        "scripts/content/router.js",
         "scripts/content/mail.js",
-        "scripts/content/assignDetails.js"
+        "scripts/content/assignDetails.js",
+        "scripts/content/router.js"
       ]
     }
   ],
