@@ -2,11 +2,21 @@
 
 ![image](https://user-images.githubusercontent.com/50122069/193476911-dff58436-3ccb-45eb-8453-8310e36c69fe.png)
 
-New features built upon Argonet:
-* Grade Simulator
+## New features built upon Argonet:
+
+Tags:
 * Shows due time, not just date
-* Shows point values of assignments if applicable.
+* Shows point values of assignments if assignment is graded.
 * Shows if assignment can be resubmitted before your first submission.
+* Shows assignment type and the type of assignment's overall weight (if weight-based class)
+* 
+
+Enhancements:
+* Archive All (inbox)
+* Mark All As Read (inbox)
+
+New Features:
+* Grade simulator (WIP, points-based class only rn)
 
 By downloading the extension, you agree and acknowlege to the following Privacy Notice & Consumer Agreements.
 
