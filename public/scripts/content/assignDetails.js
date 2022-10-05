@@ -142,8 +142,10 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     const divider = document.createElement("hr");
     divider.style.width = "100%";
 
-    const resultsDiv = document.createElement("div");
+    const resultsDiv = document.createElement("details");
     resultsDiv.style.paddingTop = "10px";
+    resultsDiv.innerText = "See Grade";
+    resultsDiv.style.paddingBottom = "10px";
 
     const gradeSimulatorInput = document.createElement("input");
     gradeSimulatorInput.type = "number";
@@ -177,7 +179,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     gradeSimulator.appendChild(gradeSimulatorInputSubtext);
     gradeSimulator.appendChild(gradeSimulatorSubText);
     // gradeSimulator.appendChild(gradeSimulatorButton);
-    gradeSimulator.appendChild(divider);
+    // gradeSimulator.appendChild(divider);
     gradeSimulator.appendChild(resultsDiv);
 
     injectionLocation[1].appendChild(gradeSimulator);
