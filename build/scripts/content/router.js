@@ -17,6 +17,10 @@ const matchURLs = async (request) => {
         console.log("ArgoPlus: Mail Detected");
         injectMail(request);
     }
+
+    if (request.url.includes("https://rutgersprep.myschoolapp.com/app/")) {
+        refreshCalendar();
+    }
 };
 
 chrome.runtime.onMessage.addListener(matchURLs);

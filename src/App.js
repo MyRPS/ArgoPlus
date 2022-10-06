@@ -1,6 +1,8 @@
 import logo from "./logo.svg";
 import "./App.css";
 
+/* global chrome */
+
 import { useEffect, useState } from "react";
 
 const Divider = ({margin = 10, ...props}) => {
@@ -24,6 +26,15 @@ const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextCo
 const Classes = () => {
   const [classes, setClasses] = useState([]);
 
+  if (!chrome)
+  {
+    return;
+  }
+
+  chrome.storage.sync.get(["calendarLinks"], (result) => {
+    console.log(`https://rutgersprep.myschoolapp.com/${result[1]["iCalLink"]}`);
+  });
+
   return (
   <>
     <details>
@@ -39,15 +50,13 @@ const Lunch = () => {
 
   const lunchAPI = `https://corsanywhere.herokuapp.com/https://www.sagedining.com/microsites/getMenuItems?menuId=113592&date=${new Date().toISOString().split("T")[0]}&meal=Lunch`;
 
-  // console.log(lunchAPI);
-
   useEffect(() => {
     fetch(lunchAPI).then(res => res.json()).then(data => {
       setMenuItems(data);
     })
   }, []);
 
-  console.log(menuItems);
+  // console.log(menuItems);
   
   return (
     <details>
@@ -76,6 +85,11 @@ const Lunch = () => {
 }
 
 const Assignments = () => {
+
+  if (!chrome)
+  {
+    return;
+  }
 
   return (
   <>
