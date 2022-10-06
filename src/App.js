@@ -25,14 +25,17 @@ const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextCo
 
 const Classes = () => {
   const [classes, setClasses] = useState([]);
+  const [title, setTitle] = useState("");
 
   if (!chrome)
   {
+    console.log("rip chrome")
     return;
   }
 
   chrome.storage.sync.get(["calendarLinks"], (result) => {
-    console.log(`https://rutgersprep.myschoolapp.com/${result[1]["iCalLink"]}`);
+    // console.log(result);
+    console.log(`https://rutgersprep.myschoolapp.com/${result["calendarLinks"][1]["iCalLink"]}`);
   });
 
   return (
