@@ -10,12 +10,12 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = ""}) => {
+const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff"}) => {
   return (
     <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
-      <p style={{fontSize: 12, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: 2}}>{subText}</p>
-      {/* <Divider margin={2} /> */}
-      <p style={{fontSize: 15, marginBottom: 2, lineHeight: 1}}>{header}</p>
+      <p style={{fontSize: 12, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: 7, color: subTextColor}}>{subText}</p>
+      {/* <Divider margin={5} /> */}
+      <p style={{fontSize: 16, marginBottom: 5, lineHeight: 1, color: headerColor}}>{header}</p>
     </div>
   );
 }
@@ -27,9 +27,8 @@ const Classes = () => {
   return (
   <>
     <details>
-      <summary style={{listStyle: "none", fontSize: 12}}><h4>Schedule</h4></summary>
-      <Divider />
-      {Array(5).fill(<DetailCards />)}
+    <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>Schedule<Divider /></summary>
+      {Array(5).fill(<DetailCards header="AP Computer Science - Lake (5)" subText="10:00PM - 11:00PM" headerColor="#AF7EFF"/>)}
     </details>
   </>)
 }
@@ -38,7 +37,7 @@ const Lunch = () => {
 
   const [menuItems, setMenuItems] = useState(null);
 
-  const lunchAPI = `https://cors-anywhere.herokuapp.com/https://www.sagedining.com/microsites/getMenuItems?menuId=113592&date=${new Date().toISOString().split("T")[0]}&meal=Lunch`;
+  const lunchAPI = `https://corsanywhere.herokuapp.com/https://www.sagedining.com/microsites/getMenuItems?menuId=113592&date=${new Date().toISOString().split("T")[0]}&meal=Lunch`;
 
   // console.log(lunchAPI);
 
@@ -52,8 +51,8 @@ const Lunch = () => {
   
   return (
     <details>
-      <summary style={{listStyle: "none", fontSize: 12}}><h4>Lunch</h4></summary>
-      <Divider />
+      <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Lunch<Divider /></summary>
+      
       { menuItems &&
         Object.keys(menuItems).map((itemName, index) => {
           // console.log(itemName + " " + menuItems[itemName]);
@@ -62,10 +61,13 @@ const Lunch = () => {
             return null;
 
           return (
-            <details key={index} open>
-              <summary style={{fontSize: 16}}>{itemName}</summary>
-              {menuItems[itemName].map(item => <DetailCards subText={item.name}/>)}
-            </details>
+            <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
+              <details key={index} open>
+                <summary style={{fontSize: 15, listStyle: "none", marginBottom: 5, color: "#AF7EFF"}}>{itemName}</summary>
+                <Divider />
+                {menuItems[itemName].map(item => <p style={{fontSize: 12}}>{item.name}</p>)}
+              </details>
+            </div>
           )
         })
       }
@@ -73,14 +75,26 @@ const Lunch = () => {
   );
 }
 
+const Assignments = () => {
+
+  return (
+  <>
+    <details>
+    <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>Assignments<Divider /></summary>
+      {Array(5).fill(<DetailCards />)}
+    </details>
+  </>)
+}
+
 function App() {
   return (
-    <div style={{width: "300px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
-      <h1>Dashboard</h1>
-      <Divider />
-      <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p>
+    <div style={{width: "500px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
+      {/* <h1>Dashboard</h1> */}
+      {/* <Divider /> */}
+      {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
       <Classes />
       <Lunch />
+      <Assignments />
     </div>
   );
 }
