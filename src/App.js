@@ -4,6 +4,7 @@ import "./App.css";
 /* global chrome */
 
 import { useEffect, useState } from "react";
+import ICalParser from "ical-js-parser";
 
 const Divider = ({margin = 10, ...props}) => {
   return (
@@ -23,9 +24,8 @@ const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextCo
 }
 
 
-const Classes = () => {
-  const [classes, setClasses] = useState([]);
-  const [title, setTitle] = useState("");
+const ICalDetails = ({title, idx}) => {
+  const [iCal, setiCal] = useState([]);
 
   if (!chrome)
   {
@@ -33,16 +33,21 @@ const Classes = () => {
     return;
   }
 
-  chrome.storage.sync.get(["calendarLinks"], (result) => {
+  chrome.storage.sync.get(["calendarLinks"], async (result) => {
     // console.log(result);
-    console.log(`https://rutgersprep.myschoolapp.com/${result["calendarLinks"][1]["iCalLink"]}`);
+
+    const calendarsICS = await fetch(`https://rutgersprep.myschoolapp.com${result["calendarLinks"][idx]["iCalLink"]}`).then(res => res.text());
+
+    const events = ICalParser.toJSON(calendarsICS);
+
+    console.log(events)
   });
 
   return (
   <>
     <details>
-    <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>Schedule<Divider /></summary>
-      {Array(5).fill(<DetailCards header="AP Computer Science - Lake (5)" subText="10:00PM - 11:00PM" headerColor="#AF7EFF"/>)}
+    <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>{title}<Divider /></summary>
+
     </details>
   </>)
 }
@@ -54,9 +59,14 @@ const Lunch = () => {
   const lunchAPI = `https://corsanywhere.herokuapp.com/https://www.sagedining.com/microsites/getMenuItems?menuId=113592&date=${new Date().toISOString().split("T")[0]}&meal=Lunch`;
 
   useEffect(() => {
-    fetch(lunchAPI).then(res => res.json()).then(data => {
-      setMenuItems(data);
-    })
+    try {
+      fetch(lunchAPI).then(res => res.json()).then(data => {
+        setMenuItems(data);
+      });
+    }
+    catch (e) {
+      return <p style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Failed to fetch lunch menu.</p>
+    }
   }, []);
 
   // console.log(menuItems);
@@ -109,9 +119,9 @@ function App() {
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
-      <Classes />
+      <ICalDetails title={"Up Next"} idx={2}/>
       <Lunch />
-      <Assignments />
+      <ICalDetails title={"Assignments"} idx={1}/>
     </div>
   );
 }
