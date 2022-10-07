@@ -16,38 +16,106 @@ const Divider = ({margin = 10, ...props}) => {
 const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff"}) => {
   return (
     <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
-      <p style={{fontSize: 12, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: 7, color: subTextColor}}>{subText}</p>
+      <p style={{fontSize: 12, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
       {/* <Divider margin={5} /> */}
-      <p style={{fontSize: 16, marginBottom: 5, lineHeight: 1, color: headerColor}}>{header}</p>
+      <p style={{fontSize: 16, marginBottom: header != "" ? 5 : 0, lineHeight: 1, color: headerColor}}>{header}</p>
     </div>
   );
 }
 
+const formatBadISO = (badISO) => {
+  return (`${badISO.substring(0, 4)}-${badISO.substring(4, 6)}-${badISO.substring(6, 8)}T${badISO.substring(9, 11)}:${badISO.substring(11, 13)}:${badISO.substring(13, 15)}`)
+}
 
-const ICalDetails = ({title, idx}) => {
+
+const ICalDetails = ({title, idx, daysLimit = -1, openByDefault = false}) => {
   const [iCal, setiCal] = useState([]);
 
-  if (!chrome)
-  {
-    console.log("rip chrome")
-    return;
+  const refresh = () => {
+    if (!chrome)
+    {
+      // console.log("rip chrome")
+      return;
+    }
+
+    chrome.storage.sync.get(["calendarLinks"], async (result) => {
+      const calendarsICS = await fetch(`https://rutgersprep.myschoolapp.com${result["calendarLinks"][idx]["iCalLink"]}`).then(res => res.text());
+      const cal = ICalParser.toJSON(calendarsICS);
+
+      console.log(idx);
+      console.log(cal);
+
+      let daysCounter = 0;
+      let prevDate = null;
+
+      const events = cal.events.filter(event => {
+        const eventDate = Date.parse(formatBadISO(event.dtstart.value));
+        const now = Date.parse(formatBadISO(event.dtstamp.value));
+
+        if (eventDate >= now)
+        {
+          if (prevDate === null || prevDate !== formatBadISO(event.dtstart.value).split("T")[0])
+          {
+            prevDate = formatBadISO(event.dtstart.value).split("T")[0];
+            daysCounter++;
+          }
+
+          if (daysLimit === -1 || daysCounter <= daysLimit)
+          {
+            return true;
+          }
+        }
+        return false;
+      })
+
+      // console.log(events)
+      setiCal(events);
+    });
   }
 
-  chrome.storage.sync.get(["calendarLinks"], async (result) => {
-    // console.log(result);
-
-    const calendarsICS = await fetch(`https://rutgersprep.myschoolapp.com${result["calendarLinks"][idx]["iCalLink"]}`).then(res => res.text());
-
-    const events = ICalParser.toJSON(calendarsICS);
-
-    console.log(events)
-  });
+  useEffect(refresh, []);
 
   return (
   <>
-    <details>
+    <details open={openByDefault}>
     <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>{title}<Divider /></summary>
+      {iCal.map((event, index) => {
 
+        let dateString = formatBadISO(event.dtstart.value).split("T")[1].split(":").slice(0, 2).join(":");
+        let diff = true;
+
+        const currDate = formatBadISO(event.dtstart.value).split("T")[0];
+
+        if (index >= 1)
+        {
+          const prevDate = formatBadISO(iCal[index - 1].dtstart.value).split("T")[0];
+
+          diff = prevDate !== currDate;
+        }
+
+        return (
+          <>
+            {diff &&
+              <>
+                <p style={{color: "#AF7EFF", marginTop: 5}}>{currDate}</p>
+              </>
+            }
+            <DetailCards key={index} subText={dateString + " | " + event.summary} headerColor="#fff" subTextColor="#fff" />
+          </>
+        )
+      })}
+      <button onClick={
+        () => {
+          if (daysLimit === 1)
+          {
+            daysLimit = 7;
+            refresh();
+            return;
+          }
+          daysLimit += 7;
+          refresh();
+        }
+      }>Load More</button>
     </details>
   </>)
 }
@@ -97,31 +165,15 @@ const Lunch = () => {
   );
 }
 
-const Assignments = () => {
-
-  if (!chrome)
-  {
-    return;
-  }
-
-  return (
-  <>
-    <details>
-    <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>Assignments<Divider /></summary>
-      {Array(5).fill(<DetailCards />)}
-    </details>
-  </>)
-}
-
 function App() {
   return (
     <div style={{width: "500px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
-      <ICalDetails title={"Up Next"} idx={2}/>
+      <ICalDetails title={"Up Next"} idx={2} daysLimit={1} openByDefault/>
       <Lunch />
-      <ICalDetails title={"Assignments"} idx={1}/>
+      <ICalDetails title={"Assignments"} idx={1} openByDefault/>
     </div>
   );
 }
