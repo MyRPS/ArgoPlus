@@ -13,23 +13,30 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff"}) => {
+const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 14, subTextSize = 12}) => {
   return (
-    <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
-      <p style={{fontSize: 12, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
+    <div style={{border: "1px solid #353535", borderRadius: 5, padding: 5, marginBottom: 5}}>
+      <p style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
       {/* <Divider margin={5} /> */}
-      <p style={{fontSize: 16, marginBottom: header != "" ? 5 : 0, lineHeight: 1, color: headerColor}}>{header}</p>
+      <p style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, lineHeight: 1, color: headerColor}}>{header}</p>
     </div>
   );
 }
 
 const formatBadISO = (badISO) => {
-  return (`${badISO.substring(0, 4)}-${badISO.substring(4, 6)}-${badISO.substring(6, 8)}T${badISO.substring(9, 11)}:${badISO.substring(11, 13)}:${badISO.substring(13, 15)}`)
+  if (badISO.includes("T"))
+  {
+    return (`${badISO.substring(0, 4)}-${badISO.substring(4, 6)}-${badISO.substring(6, 8)}T${badISO.substring(9, 11)}:${badISO.substring(11, 13)}:${badISO.substring(13, 15)}`)
+  }
+  else{
+    return (`${badISO.substring(0, 4)}-${badISO.substring(4, 6)}-${badISO.substring(6, 8)}`)
+  }
 }
 
 
-const ICalDetails = ({title, idx, daysLimit = -1, openByDefault = false}) => {
+const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefault = false}) => {
   const [iCal, setiCal] = useState([]);
+  const [daysLimit, setDaysLimit] = useState(ADaysLimit);
 
   const refresh = () => {
     if (!chrome)
@@ -68,12 +75,15 @@ const ICalDetails = ({title, idx, daysLimit = -1, openByDefault = false}) => {
         return false;
       })
 
-      // console.log(events)
+      events.sort((a, b) => {
+        return Date.parse(formatBadISO(a.dtstart.value)) - Date.parse(formatBadISO(b.dtstart.value));
+      })
+
       setiCal(events);
     });
   }
 
-  useEffect(refresh, []);
+  useEffect(refresh, [daysLimit]);
 
   return (
   <>
@@ -81,10 +91,21 @@ const ICalDetails = ({title, idx, daysLimit = -1, openByDefault = false}) => {
     <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>{title}<Divider /></summary>
       {iCal.map((event, index) => {
 
-        let dateString = formatBadISO(event.dtstart.value).split("T")[1].split(":").slice(0, 2).join(":");
-        let diff = true;
+        const eventDate = Date.parse(formatBadISO(event.dtstart.value));
+        const now = Date.parse(formatBadISO(event.dtstamp.value));
+
+        const days = eventDate - now;
 
         const currDate = formatBadISO(event.dtstart.value).split("T")[0];
+        let timeString = "";
+
+        if (formatBadISO(event.dtstart.value).includes("T"))
+        {
+          timeString = formatBadISO(event.dtstart.value).split("T")[1].split(":").slice(0, 2).join(":");
+          timeString = Number(timeString.substring(0, 2)) > 12 ? Number(timeString.substring(0, 2)) - 12 + timeString.substring(2) + "PM" : timeString.startsWith("0") ? timeString.substring(1) + "AM" : timeString + "AM";
+        }
+
+        let diff = true;
 
         if (index >= 1)
         {
@@ -95,32 +116,47 @@ const ICalDetails = ({title, idx, daysLimit = -1, openByDefault = false}) => {
 
         return (
           <>
-            {diff &&
+            {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#AF7EFF", marginTop: 5}}>{currDate}</p>
+                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 20}}>{currDate} {"(In " + Math.ceil(days / (1000 * 60 * 60 * 24)) + " days)"}</p>
               </>
             }
-            <DetailCards key={index} subText={dateString + " | " + event.summary} headerColor="#fff" subTextColor="#fff" />
+            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor="#fff" subTextColor="#fff" headerSize={12}/>
           </>
         )
       })}
-      <button onClick={
+      {daysLimit != -1 && <button onClick={
         () => {
-          if (daysLimit === 1)
-          {
-            daysLimit = 7;
-            refresh();
-            return;
-          }
-          daysLimit += 7;
-          refresh();
+          setDaysLimit(daysLimit + incrementBy);
         }
-      }>Load More</button>
+      }
+      style={{
+        border: "1px solid #707070",
+        color: "#fff",
+        backgroundColor: "#292929",
+        fontSize: 12,
+        borderRadius: 5,
+      }}
+      >Load Next</button>}
+      {daysLimit > incrementBy && daysLimit != -1 && <button onClick={
+        () => {
+          setDaysLimit(daysLimit - incrementBy);
+        }
+      }
+      style={{
+        border: "1px solid #707070",
+        color: "#fff",
+        backgroundColor: "#292929",
+        fontSize: 12,
+        borderRadius: 5,
+        paddingLeft: 5,
+      }}
+      >Hide Last</button>}
     </details>
   </>)
 }
 
-const Lunch = () => {
+const Lunch = ({openByDefault}) => {
 
   const [menuItems, setMenuItems] = useState(null);
 
@@ -140,7 +176,7 @@ const Lunch = () => {
   // console.log(menuItems);
   
   return (
-    <details>
+    <details open={openByDefault}>
       <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Lunch<Divider /></summary>
       
       { menuItems &&
@@ -167,13 +203,15 @@ const Lunch = () => {
 
 function App() {
   return (
-    <div style={{width: "500px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
+    <div style={{width: "375px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
-      <ICalDetails title={"Up Next"} idx={2} daysLimit={1} openByDefault/>
-      <Lunch />
-      <ICalDetails title={"Assignments"} idx={1} openByDefault/>
+      <ICalDetails title={"Up Next"} idx={2} ADaysLimit={1} openByDefault/>
+      <Lunch openByDefault={
+        new Date().getHours() < 13
+      }/>
+      <ICalDetails title={"Assignments"} idx={1} ADaysLimit={-1} openByDefault/>
     </div>
   );
 }
