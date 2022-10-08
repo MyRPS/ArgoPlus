@@ -1,3 +1,5 @@
+
+
 const getMailIDs = async () => {
     const mailStruct = await fetch(`https://rutgersprep.myschoolapp.com/api/message/inbox/?format=json&pageNumber=1`).then(response => response.json()).then(data => {
         return data;
@@ -6,14 +8,21 @@ const getMailIDs = async () => {
     return mailStruct.map(mail => mail["ConversationId"]).join(",");
 }
 
-const updateInbox = async (markAsRead) => {
-    const ids = await getMailIDs()
+const updateInbox = async (markAsRead, ids = "") => {
+
+    if (ids === "")
+    {
+        ids = await getMailIDs()
+    }
+
+    const verificationToken = document.getElementsByName("__RequestVerificationToken")[0].value;
+
     fetch("https://rutgersprep.myschoolapp.com/api/message/ConversationBulkUpdate/", {	
         "headers": {	
             "accept": "application/json, text/javascript, */*; q=0.01",	
             "accept-language": "en-US,en;q=0.9",	
             "content-type": "application/json",	
-            "requestverificationtoken": "XvAhx5_HHwiy5ixyVGaWJVFBsEjKKlfKypqtBZ8UH2Vse2yXYi_zBRhTVrIwvd_mdyg45pbT-7_s7cVVUydX62bOR0flxcMx1_6OMtfShoQ1 bc0be734-a4bb-4e9b-a659-a56e39c3c683",	
+            "requestverificationtoken": verificationToken,	
             "sec-ch-ua": "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"",	
             "sec-ch-ua-mobile": "?0",	
             "sec-ch-ua-platform": "\"Windows\"",	
@@ -29,8 +38,29 @@ const updateInbox = async (markAsRead) => {
         "body": `{"ids":"${ids}","markAsRead":${markAsRead}}`,	
         "method": "POST"	
     });
+}
 
-    location.reload();
+const injectButtonsPerMessage = () => {
+    const XInserts = document.getElementsByClassName("cell-message");
+
+    if (XInserts.length == 0)
+    {
+        setTimeout(injectButtonsPerMessage, 1000);
+        return;
+    }
+
+    for (const insert of XInserts)
+    {
+        const archive = document.createElement("button");
+        archive.className = "btn bb-btn-secondary btn-sm";
+        archive.innerHTML = "Archive";
+        archive.onclick = () => {
+            updateInbox(false, insert.getAttribute("data-messageid"));
+            insert.innerHTML = "Archived - Refresh to dissapear";
+        }
+
+        insert.appendChild(archive)
+    }
 }
 
 const injectMail = async (request) => {
@@ -57,28 +87,30 @@ const injectMail = async (request) => {
     allAsRead.innerHTML = "Mark All As Read";
     allAsRead.onclick = async () => {
         updateInbox(true);
+        location.reload();
     }
-    allAsRead.style.marginLeft = "10px";
-    allAsRead.style.marginRight = "10px";
-    allAsRead.style.backgroundColor = "#fff";
-    allAsRead.style.border = "1px solid #ccc";
-    allAsRead.style.borderRadius = "4px";
-    allAsRead.style.padding = "5px";
-    allAsRead.style.fontSize = "13px";
+    allAsRead.style.marginLeft = "5px";
+    allAsRead.style.marginRight = "5px";
+    allAsRead.style.display = "inline-block";
+    // allAsRead.style.backgroundColor = "#fff";
+    // allAsRead.style.border = "1px solid #ccc";
+    // allAsRead.style.borderRadius = "4px";
+    // allAsRead.style.padding = "5px";
+    // allAsRead.style.fontSize = "13px";
+    allAsRead.className = "btn bb-btn-secondary btn-sm";
 
     const allAsArchive = document.createElement("button");
     allAsArchive.innerHTML = "Archive All";
     allAsArchive.onclick = async () => {
         updateInbox(false);
+        location.reload();
     }
     allAsArchive.style.marginLeft = "10px";
     allAsArchive.style.marginRight = "10px";
-    allAsArchive.style.backgroundColor = "#fff";
-    allAsArchive.style.border = "1px solid #ccc";
-    allAsArchive.style.borderRadius = "4px";
-    allAsArchive.style.padding = "5px";
-    allAsArchive.style.fontSize = "13px";
+    allAsArchive.className = "btn bb-btn-secondary btn-sm";
 
-    actionBar.appendChild(allAsRead);
     actionBar.appendChild(allAsArchive);
+    actionBar.appendChild(allAsRead);
+
+    injectButtonsPerMessage();
 }

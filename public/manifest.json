@@ -26,6 +26,7 @@
       "js": [
         "scripts/content/mail.js",
         "scripts/content/assignDetails.js",
+        "scripts/content/backgroundCalendar.js",
         "scripts/content/router.js"
       ]
     }
@@ -49,6 +50,7 @@
   ],
 
   "permissions": [
-    "tabs"
+    "tabs",
+    "storage"
   ]
 }
