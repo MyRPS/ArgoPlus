@@ -12,7 +12,7 @@ const matchURLs = async (request) => {
         injectAssignmentDetail(request);
     }
 
-    if (request.url.includes(baseRPSURL) && request.url.includes("message/inbox"))
+    if (request.url.includes(baseRPSURL) && request.url.includes("message/inbox") && !request.url.includes("archive"))
     {
         console.log("ArgoPlus: Mail Detected");
         injectMail(request);
