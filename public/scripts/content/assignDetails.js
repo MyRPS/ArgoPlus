@@ -2,10 +2,154 @@
 
 console.log("Argo+: html script setup")
 
+const injectSubmissionHelper = () => {
+    //a list of math symbols you need
+    const mathSymbols = {
+        "pi": "π",
+        "theta": "θ",
+        "alpha": "α",
+        "beta": "β",
+        "gamma": "γ",
+        "delta": "δ",
+        "epsilon": "ε",
+        "integral": "∫",
+        "infinity": "∞",
+        "square root": "√",
+        "plus minus": "±",
+        "equals": "=",
+        "not equals": "≠",
+        "less than": "<",
+        "greater than": ">",
+        "less than or equal to": "≤",
+        "greater than or equal to": "≥",
+        "left floor": "⌊",
+        "right floor": "⌋",
+        "left ceiling": "⌈",
+        "right ceiling": "⌉",
+    }
+
+    //a list of science symbols you need
+    const scienceSymbols = {
+        "degree": "°",
+        "micro": "μ",
+        "ohm": "Ω",
+        "angstrom": "Å",
+    }
+
+    let injectPoint = document.getElementsByClassName("online-submission-text-container");
+
+    if (injectPoint.length === 0) {
+        // console.log("Argo+: Injecting submission helper fail");
+        setTimeout(injectSubmissionHelper, 2000);
+        return;
+    }
+
+    injectPoint = injectPoint[0];
+    
+    // console.log("Argo+: Injecting submission helper");
+
+    const addSymbol = (symbol) => {
+
+        //copy symbol
+        navigator.clipboard.writeText(symbol);
+
+        // let iframe = document.getElementById("online-submission-text_ifr");
+
+        // if (iframe === null) {
+        //     console.log("Argo+: Textarea not found");
+        //     setTimeout(() => addSymbol(symbol), 100);
+        //     return;
+        // }
+
+        // let textArea = iframe.contentWindow.document.getElementById("tinymce");
+
+        // if (textArea === null) {
+        //     console.log("Argo+: Textarea not found");
+        //     setTimeout(() => addSymbol(symbol), 100);
+        //     return;
+        // }
+
+        // let cursorPos = textArea.selectionStart;
+
+        // if (cursorPos === undefined) {
+        // textArea.innerHTML += symbol;
+        //     return;
+        // }
+
+        // console.log("front: " + textArea.innerHTML.substring(0, cursorPos));
+        // console.log("back: " + textArea.innerHTML.substring(cursorPos, textArea.innerHTML.length));
+
+        // console.log("cursorPos: " + cursorPos);
+
+        // textArea.innerHTML = textArea.innerHTML.substring(0, cursorPos) + symbol + textArea.innerHTML.substring(cursorPos, textArea.innerHTML.length);
+    }
+
+    const symbolDiv = document.createElement("div");
+    // symbolDiv.style.display = "flex";
+    // symbolDiv.style.flexDirection = "row";
+    // symbolDiv.style.flexWrap = "wrap";
+    symbolDiv.style.justifyContent = "center";
+    symbolDiv.style.alignItems = "center";
+    symbolDiv.style.alignContent = "center";
+
+    const mathTitle = document.createElement("h5");
+    mathTitle.innerHTML = "Math Symbols (click to copy)";
+    mathTitle.className = "muted";
+
+    const scienceTitle = document.createElement("h5");
+    scienceTitle.innerHTML = "Science Symbols (click to copy)";
+    scienceTitle.className = "muted";
+
+    const mathSymbolDiv = document.createElement("div");
+    mathSymbolDiv.style.display = "flex";
+    mathSymbolDiv.style.flexDirection = "row";
+    mathSymbolDiv.style.flexWrap = "wrap";
+    mathSymbolDiv.style.justifyContent = "center";
+    mathSymbolDiv.style.alignItems = "center";
+    mathSymbolDiv.style.alignContent = "center";
+
+    for (var key of Object.keys(mathSymbols)) {
+        const symbol = document.createElement("button");
+        symbol.style.margin = "5px";
+        symbol.innerHTML = mathSymbols[key];
+        symbol.onclick = () => {
+            addSymbol(symbol.innerHTML)
+        }
+
+        mathSymbolDiv.appendChild(symbol);
+    }
+
+    const scienceSymbolDiv = document.createElement("div");
+    scienceSymbolDiv.style.display = "flex";
+    scienceSymbolDiv.style.flexDirection = "row";
+    scienceSymbolDiv.style.flexWrap = "wrap";
+    scienceSymbolDiv.style.justifyContent = "center";
+    scienceSymbolDiv.style.alignItems = "center";
+    scienceSymbolDiv.style.alignContent = "center";
+
+    for (var key of Object.keys(scienceSymbols)) {
+        const symbol = document.createElement("button");
+        symbol.style.margin = "5px";
+        symbol.innerHTML = scienceSymbols[key];
+        symbol.onclick = () => {
+            addSymbol(symbol.innerHTML)
+        }
+
+        scienceSymbolDiv.appendChild(symbol);
+    }
+
+    symbolDiv.appendChild(mathTitle);
+    symbolDiv.appendChild(mathSymbolDiv);
+
+    symbolDiv.appendChild(scienceTitle);
+    symbolDiv.appendChild(scienceSymbolDiv);
+
+    injectPoint.appendChild(symbolDiv);
+}
+
 const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, classIndex, realClassAvg) => {
 
-    while (resultsDiv.firstChild)
-    {
+    while (resultsDiv.firstChild) {
         resultsDiv.removeChild(resultsDiv.firstChild);
     }
 
@@ -17,34 +161,33 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, cl
     const resultThisAssSubtext = document.createElement("p");
     resultThisAssSubtext.innerHTML = `On ${assignmentDetail["ShortDescription"]}`;
     resultThisAssSubtext.style.color = "#707070";
-   
-    let rawGotPoints = allGrades.map((val) => {return Number(val["Points"]);}).reduce((accumulator, value) => {
+
+    let rawGotPoints = allGrades.map((val) => { return Number(val["Points"]); }).reduce((accumulator, value) => {
         return accumulator + value;
     }, 0);
 
-    let rawMaxPoints = allGrades.map((val) => {return Number(val["MaxPoints"]);}).reduce((accumulator, value) => {
+    let rawMaxPoints = allGrades.map((val) => { return Number(val["MaxPoints"]); }).reduce((accumulator, value) => {
         return accumulator + value;
     }, 0);
 
     const experimentalGotPoints = rawGotPoints + Number(gotPoints);
     const experimentalMaxPoints = rawMaxPoints + Number(assignmentDetail["MaxPoints"]);
 
-    const before = Math.round((rawGotPoints/rawMaxPoints * 100) * 100) / 100;
-    
-    if (before != realClassAvg)
-    {
+    const before = Math.round((rawGotPoints / rawMaxPoints * 100) * 100) / 100;
+
+    if (before != realClassAvg) {
         injectDisplay(`Your current real class average (${realClassAvg}%) doesn't match up with our algorithm. Please use the prediction with a grain of salt.`, "#ffaaaf", false, false, "", "#fff", true);
     }
 
     const resultOverall = document.createElement("p");
-    resultOverall.innerHTML = `${before}% -> ${Math.round((experimentalGotPoints/experimentalMaxPoints * 100) * 100) / 100}%`;
+    resultOverall.innerHTML = `${before}% -> ${Math.round((experimentalGotPoints / experimentalMaxPoints * 100) * 100) / 100}%`;
     resultOverall.style.fontSize = "30px";
     resultOverall.style.fontWeight = "regular";
 
     const resultOverallSubtext = document.createElement("p");
     resultOverallSubtext.innerHTML = `In ${assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"]} (Before & After) <br/> `//(${weighted ? "Weight-based Class" : "Points-based Class"})`;
     resultOverallSubtext.style.color = "#707070";
-    
+
     resultsDiv.appendChild(resultThisAssSubtext);
     resultsDiv.appendChild(resultThisAss);
     resultsDiv.appendChild(resultOverallSubtext);
@@ -52,40 +195,36 @@ const injectFinalGrade = (resultsDiv, gotPoints, assignmentDetail, allGrades, cl
 }
 
 const injectGradeSimulator = async (assignmentDetail, classIndex) => {
-    
+
     const injectionLocation = document.getElementsByClassName("bb-tile-content-section");
     let earnedGrade = document.getElementsByClassName("assignment-detail-status-label")[0];
 
-    if (injectionLocation.length === 0 || earnedGrade === undefined || injectionLocation[0] === undefined)
-    {
-        setTimeout(() => {injectGradeSimulator(assignmentDetail, classIndex)}, 500);
+    if (injectionLocation.length === 0 || earnedGrade === undefined || injectionLocation[0] === undefined) {
+        setTimeout(() => { injectGradeSimulator(assignmentDetail, classIndex) }, 500);
         return;
     }
 
     const earnedGradeText = earnedGrade.innerHTML;
 
-    const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => {return result["UserInfo"]["UserId"]});
+    const UID = await fetch("https://rutgersprep.myschoolapp.com/api/webapp/context").then(r => r.json()).then(result => { return result["UserInfo"]["UserId"] });
 
-    if (assignmentDetail["MaxPoints"] === 0)
-    {
+    if (assignmentDetail["MaxPoints"] === 0) {
         return;
     }
 
     const gradeURL = `https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][classIndex]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`;
     console.log(gradeURL);
-    const allGrades = await fetch(gradeURL).then(r => r.json()).then(result => {return result});
+    const allGrades = await fetch(gradeURL).then(r => r.json()).then(result => { return result });
 
     let weighted = null
     let realClassAvg = null;
 
-    for (var gradeStruct in allGrades)
-    {
+    for (var gradeStruct in allGrades) {
         const curStruct = allGrades[gradeStruct]
 
         realClassAvg = curStruct["SectionGrade"];
 
-        if (curStruct["Weight"] != null && curStruct["AssignmentId"] === assignmentDetail["AssignmentId"])
-        {
+        if (curStruct["Weight"] != null && curStruct["AssignmentId"] === assignmentDetail["AssignmentId"]) {
             // console.log("weight " + curStruct["Weight"])
             weighted = curStruct["Weight"] + "% grade weight";
             break;
@@ -93,19 +232,16 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
         // console.log("struct " + gradeStruct);
     }
 
-    if (weighted !== null)
-    {
+    if (weighted !== null) {
         injectDisplay(weighted, "#71BC68", false, true, "", "#FFF", true);
     }
 
-    if (earnedGradeText.includes("Graded"))
-    {
+    if (earnedGradeText.includes("Graded")) {
         const gradeLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
 
-        const grade = await fetch(gradeLink).then(r => r.json()).then(result => {return result[0]["pointsEarned"]});
+        const grade = await fetch(gradeLink).then(r => r.json()).then(result => { return result[0]["pointsEarned"] });
 
-        if (grade === null)
-        {
+        if (grade === null) {
             return;
         }
 
@@ -191,9 +327,8 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
 
     const injectionLocation = document.getElementsByClassName("bb-tile-content-section");
 
-    if (injectionLocation.length === 0 || injectionLocation[0] === undefined || injectionLocation[1] === undefined)
-    {
-        setTimeout(() => {injectDisplay(label, color, isHeader, showBeta, URL, fontColor, onOther)}, 500);
+    if (injectionLocation.length === 0 || injectionLocation[0] === undefined || injectionLocation[1] === undefined) {
+        setTimeout(() => { injectDisplay(label, color, isHeader, showBeta, URL, fontColor, onOther) }, 500);
         return;
     }
 
@@ -215,12 +350,11 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
     pointDisplayText.style.display = "inline-block";
     pointDisplayText.style.marginLeft = showBeta ? "60px" : "10px";
     pointDisplayText.style.marginRight = "10px";
-    
+
     pointDisplayText.style.fontSize = isHeader ? "30px" : "15px";
     pointDisplayText.style.fontWeight = isHeader ? "bold" : "regular";
-    
-    if (URL !== "")
-    {
+
+    if (URL !== "") {
         pointDisplayText.href = URL;
         pointDisplayText.target = "_blank";
         pointDisplayText.style.paddingTop = "7px";
@@ -239,14 +373,12 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
 
     pointDisplay.appendChild(pointDisplayText);
 
-    if (showBeta)
-    {
+    if (showBeta) {
         pointDisplay.appendChild(betaTag);
     }
 
     //inject
-    if (!onOther)
-    {
+    if (!onOther) {
         while (injectionLocation[0].firstChild) {
 
             const className = injectionLocation[0].firstChild.className;
@@ -260,7 +392,7 @@ const injectDisplay = (label, color, isHeader = false, showBeta = true, URL = ""
             injectionLocation[0].removeChild(injectionLocation[0].firstChild);
         }
     }
-    
+
     injectionLocation[onOther ? 1 : 0].appendChild(pointDisplay)
 }
 
@@ -273,89 +405,81 @@ const fetchAssignmentDetailXHR = async (assignmentID) => {
     return assignmentDetail;
 }
 
+const injectButtons = () => {
+    const saveButton = document.getElementById("save-button");
+    const submitButton = document.getElementById("sub-button");
 
+    if (saveButton === null) {
+        setTimeout(() => { injectButtons() }, 500);
+        return;
+    }
 
+    // if (submitButton === null) {
+    //     setTimeout(() => { injectButtons() }, 500);
+    //     return;
+    // }
 
+    saveButton.onclick = () => {
+        setTimeout(() => { injectAssignmentDetail({url: location.href}); }, 500);
+    }
 
-
-// code to check url then inject
-const injectAssignmentDetail = async (request) => {
-    // console.log("argoplus: recieve message to content script w/ " + request.url);
-
-    // const baseURL = "https://rutgersprep.myschoolapp.com/app/student#assignmentdetail/";
-
-    // if (request.url.includes(baseURL))
-    // {
-        console.log("ArgoPlus: Assignment Details Page Detected");
-        
-        const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
-        const assignmentIndexId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[1];
-
-        // console.log(assignmentId + " and " + assignmentIndexId);
-
-        const assignmentDetail = await fetchAssignmentDetailXHR(assignmentId);
-
-        var classIndex = 0;
-        for (; classIndex < assignmentDetail["SectionLinks"].length; classIndex++)
-        {
-            if (assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"] == assignmentIndexId)
-            {
-                // console.log("match at " + classIndex);
-                break;
-            }
-        }
-
-        // console.log("classIndex: " + classIndex);
-        
-        injectDisplay(assignmentDetail["ShortDescription"], "#fff", true, false, "", "#272727");
-        injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, `https://rutgersprep.myschoolapp.com/app/student#academicclass/${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}/0/bulletinboard`, "#707070")
-        injectDisplay(assignmentDetail["LongDescription"], "#fff", false, false, "", "#272727");
-
-        if (assignmentDetail["DownloadItems"].length > 0)
-        {
-            for (var downloadKey of assignmentDetail["DownloadItems"])
-            {
-                injectDisplay("📥 " + downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", false);
-            }
-        }
-
-        if (assignmentDetail["LinkItems"].length > 0)
-        {
-            for (var linkKey of assignmentDetail["LinkItems"])
-            {
-                injectDisplay("🔗 " + linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", false);
-            }
-        }
-
-        // if (assignmentDetail["LinkItems"].length > 0 || assignmentDetail["DownloadItems"].length > 0)
-        // {
-        //     injectDisplay("Attachments:", "#fff", true, false, "", "#272727", true);
-        // }
-
-        //tags
-
-        injectDisplay("Assignment Type: " + assignmentDetail["AssignmentType"] , "#2DC8D0");
-
-        injectDisplay(assignmentDetail["DropboxResub"] ? "Resubmittable Until Deadline" : "No Resubmittions Allowed", "#2DC8D0");
-
-        injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
-        injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");
-
-        if (assignmentDetail["MaxPoints"] === 0)
-        {
-            injectDisplay("Ungraded (0 Points)", "#71BC68", false, true, "", "#fff", true);
-        }
-        
-        if (assignmentDetail["Factor"] > 1)
-        {
-            injectDisplay("Factor: " + assignmentDetail["Factor"], "#71BC68", false, true, "", "#fff", true);
-        }
-
-        injectGradeSimulator(assignmentDetail, classIndex);
+    // submitButton.onclick = () => {
+    //     setTimeout(() => { injectAssignmentDetail({url: location.href}); }, 500);
     // }
 }
 
-// chrome.runtime.onMessage.addListener(checkForAssDetailUrl);
-// checkForAssDetailUrl({url: location.href});
+// code to check url then inject
+const injectAssignmentDetail = async (request) => {
+    console.log("ArgoPlus: Assignment Details Page Detected");
 
-// export default injectAssignmentDetail;
+    const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
+    const assignmentIndexId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[1];
+
+    // console.log(assignmentId + " and " + assignmentIndexId);
+
+    const assignmentDetail = await fetchAssignmentDetailXHR(assignmentId);
+
+    var classIndex = 0;
+    for (; classIndex < assignmentDetail["SectionLinks"].length; classIndex++) {
+        if (assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"] == assignmentIndexId) {
+            break;
+        }
+    }
+
+    injectDisplay(assignmentDetail["ShortDescription"], "#fff", true, false, "", "#272727");
+    injectDisplay(assignmentDetail["SectionLinks"][classIndex]["Section"]["Name"], "#fff", false, false, `https://rutgersprep.myschoolapp.com/app/student#academicclass/${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}/0/bulletinboard`, "#707070")
+    injectDisplay(assignmentDetail["LongDescription"], "#fff", false, false, "", "#272727");
+
+    if (assignmentDetail["DownloadItems"].length > 0) {
+        for (var downloadKey of assignmentDetail["DownloadItems"]) {
+            injectDisplay("📥 " + downloadKey["ShortDescription"] + " (" + downloadKey["FriendlyFileName"] + ")", "#fff", false, false, downloadKey["DownloadUrl"], "#FFF", false);
+        }
+    }
+
+    if (assignmentDetail["LinkItems"].length > 0) {
+        for (var linkKey of assignmentDetail["LinkItems"]) {
+            injectDisplay("🔗 " + linkKey["ShortDescription"], "#fff", false, false, linkKey["Url"], "#FFF", false);
+        }
+    }
+
+    //tags
+
+    injectDisplay("Assignment Type: " + assignmentDetail["AssignmentType"], "#2DC8D0");
+
+    injectDisplay(assignmentDetail["DropboxResub"] ? "Resubmittable Until Deadline" : "No Resubmittions Allowed", "#2DC8D0");
+
+    injectDisplay("Posted " + assignmentDetail["SectionLinks"][classIndex]["AssignmentDate"], "#7368bc");
+    injectDisplay("Due " + assignmentDetail["SectionLinks"][classIndex]["DueDate"] + ",  " + assignmentDetail["SectionLinks"][classIndex]["DueTime"], "#7368bc");
+
+    if (assignmentDetail["MaxPoints"] === 0) {
+        injectDisplay("Ungraded (0 Points)", "#71BC68", false, true, "", "#fff", true);
+    }
+
+    if (assignmentDetail["Factor"] > 1) {
+        injectDisplay("Factor: " + assignmentDetail["Factor"], "#71BC68", false, true, "", "#fff", true);
+    }
+
+    injectGradeSimulator(assignmentDetail, classIndex);
+    injectSubmissionHelper();
+    injectButtons();
+}

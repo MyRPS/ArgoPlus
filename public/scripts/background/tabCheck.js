@@ -14,3 +14,5 @@ chrome.tabs.onUpdated.addListener(
       }
     }
   );
+
+//listen for internal site refresh
