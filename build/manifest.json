@@ -27,6 +27,7 @@
         "scripts/content/mail.js",
         "scripts/content/assignDetails.js",
         "scripts/content/backgroundCalendar.js",
+        "scripts/content/login.js",
         "scripts/content/router.js"
       ]
     }

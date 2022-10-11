@@ -1,6 +1,6 @@
 /* global chrome */
 
-console.log("bs setup")
+// console.log("Argo+: backgroundScript setup")
 
 chrome.tabs.onUpdated.addListener(
     function(tabId, changeInfo, tab) {

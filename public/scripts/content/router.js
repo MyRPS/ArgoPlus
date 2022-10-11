@@ -6,6 +6,10 @@ const matchURLs = async (request) => {
     const assignmentURL = "https://rutgersprep.myschoolapp.com/app/student#assignmentdetail/";
     const baseRPSURL = "https://rutgersprep.myschoolapp.com/app/";
 
+    if (request.url.includes("https://rutgersprep.myschoolapp.com/app/")) {
+        refreshCalendar();
+    }
+
     if (request.url.includes(assignmentURL))
     {
         console.log("ArgoPlus: Assignment Details Page Detected");
@@ -18,8 +22,10 @@ const matchURLs = async (request) => {
         injectMail(request);
     }
 
-    if (request.url.includes("https://rutgersprep.myschoolapp.com/app/")) {
-        refreshCalendar();
+    if (request.url === "https://rutgersprep.myschoolapp.com/app/student#login")
+    {
+        console.log("ArgoPlus: Login Page Detected");
+        injectLogin(request);
     }
 };
 

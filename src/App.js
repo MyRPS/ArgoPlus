@@ -34,7 +34,7 @@ const formatBadISO = (badISO) => {
 }
 
 
-const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefault = false}) => {
+const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefault = false, useDateStart = false}) => {
   const [iCal, setiCal] = useState([]);
   const [daysLimit, setDaysLimit] = useState(ADaysLimit);
 
@@ -46,24 +46,32 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
     }
 
     chrome.storage.sync.get(["calendarLinks"], async (result) => {
-      const calendarsICS = await fetch(`https://rutgersprep.myschoolapp.com${result["calendarLinks"][idx]["iCalLink"]}`).then(res => res.text());
+      let calendarsICS = "";
+      try {
+        calendarsICS = await fetch(`https://rutgersprep.myschoolapp.com${result["calendarLinks"][idx]["iCalLink"]}`).then(res => res.text());
+      }
+      catch (e) {
+        setiCal(null);
+        return;
+      }
+
       const cal = ICalParser.toJSON(calendarsICS);
 
-      console.log(idx);
-      console.log(cal);
+      // console.log(idx);
+      // console.log(cal);
 
       let daysCounter = 0;
-      let prevDate = null;
+      let prevEventDateOnly = null;
 
       const events = cal.events.filter(event => {
-        const eventDate = Date.parse(formatBadISO(event.dtstart.value));
+        const eventDate = Date.parse(formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value));
         const now = Date.parse(formatBadISO(event.dtstamp.value));
 
         if (eventDate >= now)
         {
-          if (prevDate === null || prevDate !== formatBadISO(event.dtstart.value).split("T")[0])
+          if (prevEventDateOnly === null || prevEventDateOnly !== formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[0])
           {
-            prevDate = formatBadISO(event.dtstart.value).split("T")[0];
+            prevEventDateOnly = formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[0];
             daysCounter++;
           }
 
@@ -76,32 +84,33 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
       })
 
       events.sort((a, b) => {
-        return Date.parse(formatBadISO(a.dtstart.value)) - Date.parse(formatBadISO(b.dtstart.value));
+        return Date.parse(formatBadISO(a[useDateStart ? "dtstart" : "dtend"].value)) - Date.parse(formatBadISO(b[useDateStart ? "dtstart" : "dtend"].value));
       })
 
       setiCal(events);
+      console.log(events);
     });
   }
 
-  useEffect(refresh, [daysLimit]);
+  useEffect(refresh, [daysLimit, useDateStart, idx]);
 
   return (
   <>
     <details open={openByDefault}>
     <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>{title}<Divider /></summary>
-      {iCal.map((event, index) => {
+      {iCal && iCal.map((event, index) => {
 
-        const eventDate = Date.parse(formatBadISO(event.dtstart.value));
+        const eventDate = Date.parse(formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value));
         const now = Date.parse(formatBadISO(event.dtstamp.value));
 
         const days = eventDate - now;
 
-        const currDate = formatBadISO(event.dtstart.value).split("T")[0];
+        const eventDateOnly = formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[0];
         let timeString = "";
 
-        if (formatBadISO(event.dtstart.value).includes("T"))
+        if (formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).includes("T"))
         {
-          timeString = formatBadISO(event.dtstart.value).split("T")[1].split(":").slice(0, 2).join(":");
+          timeString = formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[1].split(":").slice(0, 2).join(":");
           timeString = Number(timeString.substring(0, 2)) > 12 ? Number(timeString.substring(0, 2)) - 12 + timeString.substring(2) + "PM" : timeString.startsWith("0") ? timeString.substring(1) + "AM" : timeString + "AM";
         }
 
@@ -109,23 +118,25 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
 
         if (index >= 1)
         {
-          const prevDate = formatBadISO(iCal[index - 1].dtstart.value).split("T")[0];
+          const prevEventDateOnly = formatBadISO(iCal[index - 1][useDateStart ? "dtstart" : "dtend"].value).split("T")[0];
 
-          diff = prevDate !== currDate;
+          diff = prevEventDateOnly !== eventDateOnly;
         }
+
+        const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(eventDate).getDay()];
 
         return (
           <>
             {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 20}}>{currDate} {"(In " + Math.ceil(days / (1000 * 60 * 60 * 24)) + " days)"}</p>
+                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 16}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
               </>
             }
             <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor="#fff" subTextColor="#fff" headerSize={12}/>
           </>
         )
       })}
-      {daysLimit != -1 && <button onClick={
+      {daysLimit != -1 && incrementBy != 0 && <button onClick={
         () => {
           setDaysLimit(daysLimit + incrementBy);
         }
@@ -138,7 +149,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
         borderRadius: 5,
       }}
       >Load Next</button>}
-      {daysLimit > incrementBy && daysLimit != -1 && <button onClick={
+      {daysLimit > incrementBy && daysLimit != -1 &&  incrementBy != 0 && <button onClick={
         () => {
           setDaysLimit(daysLimit - incrementBy);
         }
@@ -152,6 +163,9 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
         paddingLeft: 5,
       }}
       >Hide Last</button>}
+      {
+        !iCal && <p style={{color: "#fff", fontSize: 12}}>Error fetching events. Perhaps our service expired? If so, please try logging into Argonet again.</p>
+      }
     </details>
   </>)
 }
@@ -207,7 +221,7 @@ function App() {
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
-      <ICalDetails title={"Up Next"} idx={2} ADaysLimit={1} openByDefault/>
+      <ICalDetails title={"Up Next"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
       <Lunch openByDefault={
         new Date().getHours() < 13
       }/>

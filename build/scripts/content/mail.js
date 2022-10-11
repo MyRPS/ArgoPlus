@@ -71,7 +71,7 @@ const injectMail = async (request) => {
         return;
     }
 
-    console.log("Mail Ids: " + ids);
+    // console.log("Mail Ids: " + ids);
 
     const actionBar = document.getElementById("button-bar");
 

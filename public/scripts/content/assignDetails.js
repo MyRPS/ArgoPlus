@@ -1,6 +1,6 @@
 /* global chrome, location */
 
-console.log("Argo+: html script setup")
+// console.log("Argo+: html script setup")
 
 const injectSubmissionHelper = () => {
     //a list of math symbols you need
@@ -213,7 +213,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     }
 
     const gradeURL = `https://rutgersprep.myschoolapp.com/api/datadirect/GradeBookPerformanceAssignmentStudentList/?sectionId=${assignmentDetail["SectionLinks"][classIndex]["SectionId"]}&markingPeriodId=${assignmentDetail["SectionLinks"][classIndex]["MarkingPeriodId"]}&studentUserId=${UID}&personaId=2`;
-    console.log(gradeURL);
+    console.log("grade API endpoint " + gradeURL);
     const allGrades = await fetch(gradeURL).then(r => r.json()).then(result => { return result });
 
     let weighted = null
@@ -430,7 +430,7 @@ const injectButtons = () => {
 
 // code to check url then inject
 const injectAssignmentDetail = async (request) => {
-    console.log("ArgoPlus: Assignment Details Page Detected");
+    // console.log("ArgoPlus: Assignment Details Page Detected");
 
     const assignmentId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[0];
     const assignmentIndexId = request.url.match("[0-9]+/[0-9]+")[0].split("/")[1];
