@@ -87,7 +87,7 @@ const injectMail = async (request) => {
     allAsRead.innerHTML = "Mark All As Read";
     allAsRead.onclick = async () => {
         updateInbox(true);
-        location.reload();
+        setTimeout(() => location.reload(), 1000);
     }
     allAsRead.style.marginLeft = "5px";
     allAsRead.style.marginRight = "5px";
@@ -103,7 +103,7 @@ const injectMail = async (request) => {
     allAsArchive.innerHTML = "Archive All";
     allAsArchive.onclick = async () => {
         updateInbox(false);
-        location.reload();
+        setTimeout(() => location.reload(), 1000);
     }
     allAsArchive.style.marginLeft = "10px";
     allAsArchive.style.marginRight = "10px";
