@@ -132,7 +132,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
                 <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 16}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
               </>
             }
-            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor="#fff" subTextColor="#fff" headerSize={12}/>
+            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#AF7EFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 16 : 12}/>
           </>
         )
       })}
