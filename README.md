@@ -53,4 +53,4 @@ By downloading the extension, you agree and acknowlege to the following Privacy 
 
 # Installation Instructions
 
-https://www.youtube.com/watch?v=H02diCTsGCs
+https://youtu.be/I8zjDeu-Mnc
