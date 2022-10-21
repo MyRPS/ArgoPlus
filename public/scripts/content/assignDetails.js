@@ -519,14 +519,24 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
             (weightedAssignmentCategories[category]["Weight"] !== -1
                 ? " (" + weightedAssignmentCategories[category]["Weight"] + "%)"
                 : "");
+
+        option.selected = false;
+
+        if (category === -1)
+        {
+            option.selected = true;
+        }
+
         weightSimulatorSelect.appendChild(option);
     }
 
     const weightSimulatorInput = document.createElement("input");
+    weightSimulatorInput.value = 0;
+
     weightSimulatorInput.type = "number";
     weightSimulatorInput.max = 100;
     weightSimulatorInput.min = "0";
-    weightSimulatorInput.value = 0;
+    
     weightSimulatorInput.style.width = "50px";
     weightSimulatorInput.style.alignContent = "end";
     weightSimulatorInput.style.height = 50;
@@ -538,6 +548,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     weightSimulatorInput.style.marginTop = "15px";
     weightSimulatorInput.style.marginBottom = "15px";
     weightSimulatorInput.className = "ArgoPlus-Weight ArgoPlus-Weight-Input";
+    // weightSimulatorInput.disabled = true;
 
     const weightSimulatorInputSubtext = document.createElement("p");
     weightSimulatorInputSubtext.innerHTML = "% Weight";
