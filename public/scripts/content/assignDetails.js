@@ -112,6 +112,7 @@ const injectSubmissionHelper = () => {
     for (var key of Object.keys(mathSymbols)) {
         const symbol = document.createElement("button");
         symbol.style.margin = "5px";
+        symbol.className = "btn-default btn";
         symbol.innerHTML = mathSymbols[key];
         symbol.onclick = () => {
             addSymbol(symbol.innerHTML);
@@ -130,6 +131,7 @@ const injectSubmissionHelper = () => {
 
     for (var key of Object.keys(scienceSymbols)) {
         const symbol = document.createElement("button");
+        symbol.className = "btn-default btn";
         symbol.style.margin = "5px";
         symbol.innerHTML = scienceSymbols[key];
         symbol.onclick = () => {
@@ -140,6 +142,7 @@ const injectSubmissionHelper = () => {
     }
 
     const changeViewButton = document.createElement("button");
+    changeViewButton.className = "btn-default btn";
     changeViewButton.innerHTML = "View Tiled";
     changeViewButton.style.margin = "5px";
     changeViewButton.onclick = () => {
@@ -153,6 +156,7 @@ const injectSubmissionHelper = () => {
     };
 
     const extendViewBox = document.createElement("button");
+    extendViewBox.className = "btn-default btn";
     extendViewBox.innerHTML = "Expand Box";
     extendViewBox.style.margin = "5px";
     extendViewBox.onclick = () => {
@@ -160,6 +164,7 @@ const injectSubmissionHelper = () => {
     };
 
     const shrinkViewBox = document.createElement("button");
+    shrinkViewBox.className = "btn-default btn";
     shrinkViewBox.innerHTML = "Shorten Box";
     shrinkViewBox.style.margin = "5px";
     shrinkViewBox.onclick = () => {
@@ -167,6 +172,7 @@ const injectSubmissionHelper = () => {
     };
 
     const resetViewBox = document.createElement("button");
+    resetViewBox.className = "btn-default btn";
     resetViewBox.innerHTML = "Reset Box Size";
     resetViewBox.style.margin = "5px";
     resetViewBox.onclick = () => {
