@@ -166,9 +166,17 @@ const injectSubmissionHelper = () => {
         setViewBoxSize(false);
     };
 
+    const resetViewBox = document.createElement("button");
+    resetViewBox.innerHTML = "Reset Box Size";
+    resetViewBox.style.margin = "5px";
+    resetViewBox.onclick = () => {
+        setViewBoxSize(true, true);
+    };
+
     injectPoint.appendChild(changeViewButton);
     injectPoint.appendChild(extendViewBox);
     injectPoint.appendChild(shrinkViewBox);
+    injectPoint.appendChild(resetViewBox);
 
     symbolDiv.appendChild(mathTitle);
     symbolDiv.appendChild(mathSymbolDiv);
@@ -787,13 +795,18 @@ const injectButtons = () => {
     // }
 };
 
-const setViewBoxSize = (bigger = true) => {
+const setViewBoxSize = (bigger = true, reset = false) => {
     const subBox = document.getElementsByClassName("tox-tinymce")[0];
 
     if (subBox === undefined) {
         setTimeout(() => {
             setViewBoxSize(bigger);
         }, 500);
+        return;
+    }
+
+    if (reset) {
+        subBox.style.height = "200px";
         return;
     }
 
