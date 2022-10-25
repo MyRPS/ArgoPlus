@@ -13,6 +13,14 @@
 * Shows assignment type and the type of assignment's overall weight (if weight-based class)
 * & a few more tags when they apply.
 
+## Submission+:
+<img width="508" alt="image" src="https://user-images.githubusercontent.com/50122069/197799604-31792f98-219b-4144-9630-daa7002bed9a.png">
+* Can make the sub box bigger/smaller
+
+* Forced tile view if needed to see submission box wider.
+
+* common math/science symbols to copy and paste if needed
+
 ## Grade Simulator (Points-based):
 
 ![image](https://user-images.githubusercontent.com/50122069/194688092-b4adc3f6-a35d-43c0-adb8-46a8a7f75d8f.png)
