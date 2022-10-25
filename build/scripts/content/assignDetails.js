@@ -139,12 +139,42 @@ const injectSubmissionHelper = () => {
         scienceSymbolDiv.appendChild(symbol);
     }
 
+    const changeViewButton = document.createElement("button");
+    changeViewButton.innerHTML = "View Tiled";
+    changeViewButton.style.margin = "5px";
+    changeViewButton.onclick = () => {
+        if (changeViewButton.innerHTML === "View Tiled") {
+            expandViewFull(false);
+            changeViewButton.innerHTML = "View Side By Side";
+        } else {
+            expandViewFull(true);
+            changeViewButton.innerHTML = "View Tiled";
+        }
+    };
+
+    const extendViewBox = document.createElement("button");
+    extendViewBox.innerHTML = "Expand Box";
+    extendViewBox.style.margin = "5px";
+    extendViewBox.onclick = () => {
+        setViewBoxSize(true);
+    };
+
+    const shrinkViewBox = document.createElement("button");
+    shrinkViewBox.innerHTML = "Shorten Box";
+    shrinkViewBox.style.margin = "5px";
+    shrinkViewBox.onclick = () => {
+        setViewBoxSize(false);
+    };
+
+    injectPoint.appendChild(changeViewButton);
+    injectPoint.appendChild(extendViewBox);
+    injectPoint.appendChild(shrinkViewBox);
+
     symbolDiv.appendChild(mathTitle);
     symbolDiv.appendChild(mathSymbolDiv);
 
     symbolDiv.appendChild(scienceTitle);
     symbolDiv.appendChild(scienceSymbolDiv);
-
     injectPoint.appendChild(symbolDiv);
 };
 
@@ -756,6 +786,52 @@ const injectButtons = () => {
     //     setTimeout(() => { injectAssignmentDetail({url: location.href}); }, 500);
     // }
 };
+
+const setViewBoxSize = (bigger = true) => {
+    const subBox = document.getElementsByClassName("tox-tinymce")[0];
+
+    if (subBox === undefined) {
+        setTimeout(() => {
+            setViewBoxSize(bigger);
+        }, 500);
+        return;
+    }
+
+    if (!bigger && subBox.style.height === "200px") {
+        return;
+    }
+
+    const curHeight = Number(subBox.style.height.replace("px", ""));
+    subBox.style.height = bigger ? (curHeight + 250) + "px": (curHeight - 250) + "px";
+}
+
+const expandViewFull = (reset = false) => {
+    const subBox = document.getElementsByClassName("tox-tinymce")[0];
+    const subBigBox = document.getElementsByClassName("bb-page-content-tile-column");
+
+    // console.log("get subbox" + subBox);
+
+    if (subBox == null || subBigBox == null) {
+        setTimeout(() => {
+            expandViewFull();
+        }, 500);
+        return;
+    }
+
+    if (reset)
+    {
+        for (var elem of subBigBox)
+        {
+            elem.style = "";
+        }
+        return;
+    }
+
+    for (var elem of subBigBox)
+    {
+        elem.style.width = "100%";
+    }
+}
 
 // code to check url then inject
 const injectAssignmentDetail = async (request) => {
