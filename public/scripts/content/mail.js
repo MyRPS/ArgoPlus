@@ -114,3 +114,40 @@ const injectMail = async (request) => {
 
     injectButtonsPerMessage();
 }
+
+const injectReply = () => {
+    const replyBox = document.getElementsByClassName("tox-tinymce");
+
+    if (replyBox.length === 0)
+    {
+        setTimeout(injectReply, 500);
+        return;
+    }
+
+    const reply = replyBox[0];
+
+    if (reply == null)
+    {
+        setTimeout(injectReply, 500);
+        return;
+    }
+
+    const resizer = document.createElement("button");
+    resizer.innerHTML = "Enlarge Reply Box";
+    resizer.className = "btn bb-btn-secondary";
+
+    resizer.onclick = () => {
+        if (reply.style.height === "400px")
+        {
+            reply.style.height = "200px";
+            resizer.innerHTML = "Enlarge Reply Box";
+        }
+        else
+        {
+            reply.style.height = "400px";
+            resizer.innerHTML = "Smallen Reply Box";
+        }
+    }
+
+    reply.parentNode.insertBefore(resizer, reply);
+}
