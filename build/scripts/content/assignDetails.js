@@ -48,6 +48,10 @@ const injectSubmissionHelper = () => {
 
     injectPoint = injectPoint[0];
 
+    if (document.getElementsByClassName("ArgoPlus-SubmissionHelper").length > 0) {
+        return;
+    }
+
     // console.log("Argo+: Injecting submission helper");
 
     const addSymbol = (symbol) => {
@@ -86,9 +90,7 @@ const injectSubmissionHelper = () => {
     };
 
     const symbolDiv = document.createElement("div");
-    // symbolDiv.style.display = "flex";
-    // symbolDiv.style.flexDirection = "row";
-    // symbolDiv.style.flexWrap = "wrap";
+    symbolDiv.className = "ArgoPlus-SubmissionHelper";
     symbolDiv.style.justifyContent = "center";
     symbolDiv.style.alignItems = "center";
     symbolDiv.style.alignContent = "center";
