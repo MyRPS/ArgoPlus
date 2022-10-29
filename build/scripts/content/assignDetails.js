@@ -1,6 +1,68 @@
 /* global chrome, location */
 
-// console.log("Argo+: html script setup")
+const injectBetterTextbox = () => {
+    let injectionLocation = document.getElementsByClassName(
+        "online-submission-text-container"
+    );
+
+    if (injectionLocation.length === 0 || injectionLocation[0] == null) {
+        setTimeout(() => {
+            injectBetterTextbox();
+        }, 500);
+        return;
+    }
+
+    injectionLocation = injectionLocation[0];
+
+    const div = document.createElement("div");
+    div.innerHTML = `<!-- Main Quill library -->
+    <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <!-- Theme included stylesheets -->
+    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+    
+    <!-- Core build with no theme, formatting, non-essential modules -->
+    <link href="//cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
+    <script src="//cdn.quilljs.com/1.3.6/quill.core.js"></script>`;
+    div.id = "ArgoPlus-SubBox";
+
+    console.log("sub box working");
+
+    injectionLocation.appendChild(div);
+
+    var toolbarOptions = [
+        ["bold", "italic", "underline", "strike"], // toggled buttons
+        ["blockquote", "code-block"],
+
+        [{ header: 1 }, { header: 2 }], // custom button values
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ script: "sub" }, { script: "super" }], // superscript/subscript
+        [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+        [{ direction: "rtl" }], // text direction
+
+        [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+        [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+        [{ font: [] }],
+        [{ align: [] }],
+
+        ["clean"], // remove formatting button
+    ];
+
+    const editor = document.createElement("script");
+    editor.innerHTML = `var editor = new Quill(div, {
+        modules: {
+          toolbar: toolbarOptions
+        },
+        placeholder: 'Try this new editor...',
+        theme: 'snow'
+      });`;
+
+    div.appendChild(editor);
+};
 
 const injectSubmissionHelper = () => {
     //a list of math symbols you need
@@ -48,7 +110,9 @@ const injectSubmissionHelper = () => {
 
     injectPoint = injectPoint[0];
 
-    if (document.getElementsByClassName("ArgoPlus-SubmissionHelper").length > 0) {
+    if (
+        document.getElementsByClassName("ArgoPlus-SubmissionHelper").length > 0
+    ) {
         return;
     }
 
@@ -312,13 +376,14 @@ const injectFinalGrade = (
 
         now = `${Math.round(avg * 100 * 100) / 100}`;
     } else {
-
-        if (gotWeightID !== -1)
-        {
-            document.getElementsByClassName("ArgoPlus-Weight-Input")[0].disabled = true;
-        }
-        else {
-            document.getElementsByClassName("ArgoPlus-Weight-Input")[0].disabled = false;
+        if (gotWeightID !== -1) {
+            document.getElementsByClassName(
+                "ArgoPlus-Weight-Input"
+            )[0].disabled = true;
+        } else {
+            document.getElementsByClassName(
+                "ArgoPlus-Weight-Input"
+            )[0].disabled = false;
         }
 
         for (const AssignmentTypeId of Object.keys(newDS)) {
@@ -568,8 +633,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
 
         option.selected = false;
 
-        if (category === -1)
-        {
+        if (category === -1) {
             option.selected = true;
         }
 
@@ -582,7 +646,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
     weightSimulatorInput.type = "number";
     weightSimulatorInput.max = 100;
     weightSimulatorInput.min = "0";
-    
+
     weightSimulatorInput.style.width = "50px";
     weightSimulatorInput.style.alignContent = "end";
     weightSimulatorInput.style.height = 50;
@@ -629,8 +693,7 @@ const injectGradeSimulator = async (assignmentDetail, classIndex) => {
         );
     };
     weightSimulatorSelect.onchange = () => {
-        weightSimulatorInput.value =
-        weightSimulatorSelect.value.split(" ")[1];
+        weightSimulatorInput.value = weightSimulatorSelect.value.split(" ")[1];
         injectFinalGrade(
             resultsDiv,
             gradeSimulatorInput.value,
@@ -823,12 +886,16 @@ const setViewBoxSize = (bigger = true, reset = false) => {
     }
 
     const curHeight = Number(subBox.style.height.replace("px", ""));
-    subBox.style.height = bigger ? (curHeight + 250) + "px": (curHeight - 250) + "px";
-}
+    subBox.style.height = bigger
+        ? curHeight + 250 + "px"
+        : curHeight - 250 + "px";
+};
 
 const expandViewFull = (reset = false) => {
     const subBox = document.getElementsByClassName("tox-tinymce")[0];
-    const subBigBox = document.getElementsByClassName("bb-page-content-tile-column");
+    const subBigBox = document.getElementsByClassName(
+        "bb-page-content-tile-column"
+    );
 
     // console.log("get subbox" + subBox);
 
@@ -839,20 +906,17 @@ const expandViewFull = (reset = false) => {
         return;
     }
 
-    if (reset)
-    {
-        for (var elem of subBigBox)
-        {
+    if (reset) {
+        for (var elem of subBigBox) {
             elem.style = "";
         }
         return;
     }
 
-    for (var elem of subBigBox)
-    {
+    for (var elem of subBigBox) {
         elem.style.width = "100%";
     }
-}
+};
 
 // code to check url then inject
 const injectAssignmentDetail = async (request) => {
@@ -988,4 +1052,5 @@ const injectAssignmentDetail = async (request) => {
     injectGradeSimulator(assignmentDetail, classIndex);
     injectSubmissionHelper();
     injectButtons();
+    injectBetterTextbox();
 };
