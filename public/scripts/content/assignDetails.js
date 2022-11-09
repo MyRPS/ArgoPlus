@@ -1,5 +1,41 @@
 /* global chrome, location */
 
+const setOfficialTextBoxContent = (newHtml) => {
+    let injectionIframe = document.getElementById(
+        "online-submission-text_ifr"
+    );
+
+    if (injectionIframe == null) {
+        console.log("cant find iframe");
+        setTimeout(() => {
+            setOfficialTextBoxContent(newHtml);
+        }, 500);
+        return;
+    }
+
+    const doc2 = injectionIframe.contentWindow.document;
+
+    if (doc2 == null) {
+        console.log("cant find doc2");
+        setTimeout(() => {
+            setOfficialTextBoxContent(newHtml);
+        }, 500);
+        return;
+    }
+
+    const textbox = doc2.getElementById("tinymce");
+
+    if (textbox == null) {
+        console.log("cant find textbox");
+        setTimeout(() => {
+            setOfficialTextBoxContent(newHtml);
+        }, 500);
+        return;
+    }
+
+    textbox.innerHTML = newHtml;
+};
+
 const injectBetterTextbox = () => {
     let injectionLocation = document.getElementsByClassName(
         "online-submission-text-container"
@@ -15,17 +51,38 @@ const injectBetterTextbox = () => {
     injectionLocation = injectionLocation[0];
 
     const betterTextInput = document.createElement("iframe");
-    betterTextInput.style.width = "100%";
+    betterTextInput.width = "100%";
+    betterTextInput.height = "100%";
     betterTextInput.style.height = "400px";
     betterTextInput.className = "ArgoPlus-BetterTextboxInputIframe";
     betterTextInput.src = "https://myrps.github.io/BetterArgoTextInput/";
 
-    betterTextInput.onchange = () => {
-        const text = betterTextInput.contentWindow.document.body.innerHTML;
-        document.getElementsByClassName("mce-content-body")[0].value = text;
-    };
-
     injectionLocation.appendChild(betterTextInput);
+
+    // const injectOnChangeNewTextbox = () => {
+
+    //     const doc2 = betterTextInput.contentWindow.document;
+
+    //     if (!doc2){
+    //         console.log("not found text interior yet");
+    //         setTimeout(injectOnChangeNewTextbox, 1000); return;
+    //     }
+
+    //     const textboxInterior = doc2.getElementsByClassName("ql-editor");
+
+    //     if (!textboxInterior)
+    //     {
+    //         console.log("not found text interior yet");
+    //         setTimeout(injectOnChangeNewTextbox, 1000); return;
+    //     }
+
+    //     textboxInterior.addEventListener("input", () => {
+    //         const text = textboxInterior.innerHTML;
+    //         console.log(text);
+    //     });
+    // }
+
+    // setTimeout(injectOnChangeNewTextbox, 1000);
 };
 
 const injectSubmissionHelper = () => {
