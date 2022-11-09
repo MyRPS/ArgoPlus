@@ -1,5 +1,10 @@
 /* global chrome, location */
 
+//works:
+/*
+document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe")[0].contentWindow.postMessage({target: 'ArgoPlus-Post', html: '<p>asdfadfasdfdfsasdfadfadfadfdafdfadf</p>'}, "*")
+*/
+
 const setOfficialTextBoxContent = (newHtml) => {
     let injectionIframe = document.getElementById(
         "online-submission-text_ifr"
@@ -36,17 +41,49 @@ const setOfficialTextBoxContent = (newHtml) => {
     textbox.innerHTML = newHtml;
 };
 
-const injectBetterTextbox = () => {
+const setNewTextBoxContent = (newHtml) => {
+    const subBox = document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe")[0];
+
+    if (subBox == null) {
+        console.log("cant find iframe");
+        setTimeout(() => {
+            setNewTextBoxContent(newHtml);
+        }, 500);
+        return;
+    }
+
+    const subWindow = subBox.contentWindow;
+
+    if (subWindow == null)
+    {
+        console.log("cant find cw");
+        setTimeout(() => {
+            setNewTextBoxContent(newHtml);
+        }, 500);
+        return;
+    }
+
+    subWindow.postMessage({target: 'ArgoPlus-Post', html: newHtml}, "*")
+}
+
+const injectBetterTextbox = (assignmentDetail, classIndex) => {
     let injectionLocation = document.getElementsByClassName(
         "online-submission-text-container"
     );
 
     if (injectionLocation.length === 0 || injectionLocation[0] == null) {
         setTimeout(() => {
-            injectBetterTextbox();
+            injectBetterTextbox(assignmentDetail, classIndex);
         }, 500);
         return;
     }
+
+    window.addEventListener("message", (event) => {
+        console.log("yo wut" + event.data);
+        if (event.data.target === "ArgoPlus-Updated") {
+            setOfficialTextBoxContent(event.data.html);
+        }
+    })
 
     injectionLocation = injectionLocation[0];
 
@@ -59,30 +96,25 @@ const injectBetterTextbox = () => {
 
     injectionLocation.appendChild(betterTextInput);
 
-    // const injectOnChangeNewTextbox = () => {
+    setTimeout(async () => {
+        const UID = await fetch(
+            "https://rutgersprep.myschoolapp.com/api/webapp/context"
+        )
+            .then((r) => r.json())
+            .then((result) => {
+                return result["UserInfo"]["UserId"];
+            });
 
-    //     const doc2 = betterTextInput.contentWindow.document;
+        const answerLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
 
-    //     if (!doc2){
-    //         console.log("not found text interior yet");
-    //         setTimeout(injectOnChangeNewTextbox, 1000); return;
-    //     }
+        const answer = await fetch(answerLink)
+            .then((r) => r.json())
+            .then((result) => {
+                return result[0]["dbDetail"];
+            });
 
-    //     const textboxInterior = doc2.getElementsByClassName("ql-editor");
-
-    //     if (!textboxInterior)
-    //     {
-    //         console.log("not found text interior yet");
-    //         setTimeout(injectOnChangeNewTextbox, 1000); return;
-    //     }
-
-    //     textboxInterior.addEventListener("input", () => {
-    //         const text = textboxInterior.innerHTML;
-    //         console.log(text);
-    //     });
-    // }
-
-    // setTimeout(injectOnChangeNewTextbox, 1000);
+        setNewTextBoxContent(answer);
+    }, 1000);
 };
 
 const injectSubmissionHelper = () => {
@@ -1073,5 +1105,5 @@ const injectAssignmentDetail = async (request) => {
     injectGradeSimulator(assignmentDetail, classIndex);
     injectSubmissionHelper();
     injectButtons();
-    injectBetterTextbox();
+    injectBetterTextbox(assignmentDetail, classIndex);
 };
