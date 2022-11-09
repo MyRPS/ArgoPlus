@@ -14,54 +14,18 @@ const injectBetterTextbox = () => {
 
     injectionLocation = injectionLocation[0];
 
-    const div = document.createElement("div");
-    div.innerHTML = `<!-- Main Quill library -->
-    <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    
-    <!-- Theme included stylesheets -->
-    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
-    
-    <!-- Core build with no theme, formatting, non-essential modules -->
-    <link href="//cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
-    <script src="//cdn.quilljs.com/1.3.6/quill.core.js"></script>`;
-    div.id = "ArgoPlus-SubBox";
+    const betterTextInput = document.createElement("iframe");
+    betterTextInput.style.width = "100%";
+    betterTextInput.style.height = "400px";
+    betterTextInput.className = "ArgoPlus-BetterTextboxInputIframe";
+    betterTextInput.src = "https://myrps.github.io/BetterArgoTextInput/";
 
-    console.log("sub box working");
+    betterTextInput.onchange = () => {
+        const text = betterTextInput.contentWindow.document.body.innerHTML;
+        document.getElementsByClassName("mce-content-body")[0].value = text;
+    };
 
-    injectionLocation.appendChild(div);
-
-    var toolbarOptions = [
-        ["bold", "italic", "underline", "strike"], // toggled buttons
-        ["blockquote", "code-block"],
-
-        [{ header: 1 }, { header: 2 }], // custom button values
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ script: "sub" }, { script: "super" }], // superscript/subscript
-        [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-        [{ direction: "rtl" }], // text direction
-
-        [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-
-        [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-        [{ font: [] }],
-        [{ align: [] }],
-
-        ["clean"], // remove formatting button
-    ];
-
-    const editor = document.createElement("script");
-    editor.innerHTML = `var editor = new Quill(div, {
-        modules: {
-          toolbar: toolbarOptions
-        },
-        placeholder: 'Try this new editor...',
-        theme: 'snow'
-      });`;
-
-    div.appendChild(editor);
+    injectionLocation.appendChild(betterTextInput);
 };
 
 const injectSubmissionHelper = () => {
@@ -867,21 +831,21 @@ const injectButtons = () => {
 };
 
 const setViewBoxSize = (bigger = true, reset = false) => {
-    const subBox = document.getElementsByClassName("tox-tinymce")[0];
+    const subBox = document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe")[0];
 
     if (subBox === undefined) {
         setTimeout(() => {
-            setViewBoxSize(bigger);
+            setViewBoxSize(bigger, reset);
         }, 500);
         return;
     }
 
     if (reset) {
-        subBox.style.height = "200px";
+        subBox.style.height = "400px";
         return;
     }
 
-    if (!bigger && subBox.style.height === "200px") {
+    if (!bigger && subBox.style.height === "400px") {
         return;
     }
 
