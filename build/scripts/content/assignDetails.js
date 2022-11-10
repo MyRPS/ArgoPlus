@@ -98,6 +98,8 @@ const injectBetterTextbox = (assignmentDetail, classIndex) => {
     })
 
     injectionLocation = injectionLocation[0];
+    
+    oldTextBox.style.height = "400px";
 
     const showNew = document.createElement("button");
     showNew.innerHTML = "[BETA] <b>SAVE BEFORE CLICKING</b> Try Argo+ Textbox";
