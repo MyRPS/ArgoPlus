@@ -78,8 +78,20 @@ const injectBetterTextbox = (assignmentDetail, classIndex) => {
         return;
     }
 
+    if (document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe").length > 0) {
+        return;
+    }
+
+    const oldTextBox = document.getElementsByClassName("tox-tinymce")[0];
+
+    if (oldTextBox == null) {
+        setTimeout(() => {
+            injectBetterTextbox(assignmentDetail, classIndex);
+        }, 500);
+        return;
+    }
+
     window.addEventListener("message", (event) => {
-        console.log("yo wut" + event.data);
         if (event.data.target === "ArgoPlus-Updated") {
             setOfficialTextBoxContent(event.data.html);
         }
@@ -87,12 +99,27 @@ const injectBetterTextbox = (assignmentDetail, classIndex) => {
 
     injectionLocation = injectionLocation[0];
 
+    const showNew = document.createElement("button");
+    showNew.innerHTML = "[BETA] <b>SAVE BEFORE CLICKING</b> Try Argo+ Textbox";
+    showNew.style.margin = "5px";
+    showNew.className = "btn-default btn";
+
+    injectionLocation.appendChild(showNew);
+
     const betterTextInput = document.createElement("iframe");
     betterTextInput.width = "100%";
     betterTextInput.height = "100%";
     betterTextInput.style.height = "400px";
+    betterTextInput.style.border = "1px";
     betterTextInput.className = "ArgoPlus-BetterTextboxInputIframe";
     betterTextInput.src = "https://myrps.github.io/BetterArgoTextInput/";
+    betterTextInput.style.display = "none";
+
+    showNew.onclick = () => {
+        oldTextBox.style.display = "none";
+        showNew.style.display = "none";
+        betterTextInput.style.display = "inline";
+    };
 
     injectionLocation.appendChild(betterTextInput);
 
@@ -107,12 +134,16 @@ const injectBetterTextbox = (assignmentDetail, classIndex) => {
 
         const answerLink = `https://rutgersprep.myschoolapp.com/api/datadirect/AssignmentStudentDetail?format=json&studentId=${UID}&AssignmentIndexId=${assignmentDetail["SectionLinks"][classIndex]["AssignmentIndexId"]}`;
 
-        const answer = await fetch(answerLink)
+        let answer = await fetch(answerLink)
             .then((r) => r.json())
             .then((result) => {
                 return result[0]["dbDetail"];
             });
 
+        answer = answer.replaceAll("\n", "").replaceAll("div", "p");
+
+
+        console.log("found saved" + answer);
         setNewTextBoxContent(answer);
     }, 1000);
 };
@@ -920,9 +951,10 @@ const injectButtons = () => {
 };
 
 const setViewBoxSize = (bigger = true, reset = false) => {
-    const subBox = document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe")[0];
+    const subBox = document.getElementsByClassName("tox-tinymce")[0];
+    const subBoxNew = document.getElementsByClassName("ArgoPlus-BetterTextboxInputIframe")[0];
 
-    if (subBox === undefined) {
+    if (subBox === undefined || subBoxNew === undefined) {
         setTimeout(() => {
             setViewBoxSize(bigger, reset);
         }, 500);
@@ -931,10 +963,11 @@ const setViewBoxSize = (bigger = true, reset = false) => {
 
     if (reset) {
         subBox.style.height = "400px";
+        subBoxNew.style.height = "400px";
         return;
     }
 
-    if (!bigger && subBox.style.height === "400px") {
+    if (!bigger && subBox.style.height === "400px" && subBoxNew.style.height === "400px") {
         return;
     }
 
@@ -942,6 +975,11 @@ const setViewBoxSize = (bigger = true, reset = false) => {
     subBox.style.height = bigger
         ? curHeight + 250 + "px"
         : curHeight - 250 + "px";
+    
+    const curHeightNew = Number(subBoxNew.style.height.replace("px", ""));
+    subBoxNew.style.height = bigger
+        ? curHeightNew + 250 + "px"
+        : curHeightNew - 250 + "px";
 };
 
 const expandViewFull = (reset = false) => {
@@ -1103,7 +1141,7 @@ const injectAssignmentDetail = async (request) => {
     }
 
     injectGradeSimulator(assignmentDetail, classIndex);
+    injectBetterTextbox(assignmentDetail, classIndex);
     injectSubmissionHelper();
     injectButtons();
-    injectBetterTextbox(assignmentDetail, classIndex);
 };
