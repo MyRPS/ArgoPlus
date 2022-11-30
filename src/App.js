@@ -192,6 +192,7 @@ const Lunch = ({openByDefault}) => {
   return (
     <details open={openByDefault}>
       <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Lunch<Divider /></summary>
+      <a href="https://www.sagedining.com/sites/rutgerspreparatory/menu" target="_blank">Click for lunch menu (if tray doesn't display)</a>
       
       { menuItems &&
         Object.keys(menuItems).map((itemName, index) => {
