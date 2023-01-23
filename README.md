@@ -2,6 +2,8 @@
 
 **NOTE: BETA APPLICATION, MAY NOT BE 100% ACCURATE**
 
+Legality statement: I've been questioned multiple times on this. Nothing about this application is illegal or "hacking". Everything you can see is part of the Argonet database API & is under public domain either visible to the client or an API call away (still publically accessible). I do not store your personal information at all and this app isn't the reason for the Microsoft sign-in.
+
 # What's new?
 
 ## Tags:
