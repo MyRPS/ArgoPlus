@@ -41,7 +41,15 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
   const refresh = () => {
     if (!chrome)
     {
-      // console.log("rip chrome")
+      // chrome = {
+      //   storage: {
+      //     sync: {
+      //       calendarLinks: [
+
+      //       ]
+      //     }
+      //   }
+      // }
       return;
     }
 
@@ -216,17 +224,42 @@ const Lunch = ({openByDefault}) => {
   );
 }
 
+const QuickLinks = () => {
+  return (
+    <details open>
+      <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Links<Divider /></summary>
+      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 30, fontSize: 12, borderRadius: 100, marginBottom: 5}} onClick={
+        () => {
+          window.open("https://rutgersprep.myschoolapp.com/app/student#login", "_blank").focus();
+        }}
+      >Argonet</button>
+      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 30, fontSize: 12, borderRadius: 100, marginBottom: 5}} onClick={
+        () => {
+          window.open("https://www.sagedining.com/sites/rutgerspreparatory/menu", "_blank").focus();
+        }}
+      >Lunch Menu</button>
+    </details>
+  );
+}
+
 function App() {
   return (
-    <div style={{width: "375px", height: "500px", padding: "25px", backgroundColor: "#292929", color: "#fff", overflowY: "scroll"}}>
+    <div style={{width: "700px", height: "500px", padding: "25px", backgroundColor: "#000", color: "#fff", overflowY: "scroll", 
+    }}>
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
-      <ICalDetails title={"Up Next"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
-      <Lunch openByDefault={
-        new Date().getHours() < 13
-      }/>
-      <ICalDetails title={"Assignments"} idx={1} ADaysLimit={-1} openByDefault/>
+      <table style={{border: "none"}}>
+        <tr>
+          <td style={{width: "40%", verticalAlign: "top"}}>
+            <ICalDetails title={"My Schedule"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
+            <QuickLinks />
+          </td>
+          <td style={{width: "60%", verticalAlign: "top"}}>
+            <ICalDetails title={"My Assignments"} idx={1} ADaysLimit={-1} openByDefault/>
+          </td>
+        </tr>
+      </table>
     </div>
   );
 }
