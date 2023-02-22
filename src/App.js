@@ -13,7 +13,7 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 14, subTextSize = 12}) => {
+const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 10, subTextSize = 6}) => {
   return (
     <div style={{border: "1px solid #353535", borderRadius: 5, padding: 5, marginBottom: 5}}>
       <p style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
@@ -137,10 +137,10 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
           <>
             {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 16}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
+                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
               </>
             }
-            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#AF7EFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 16 : 12}/>
+            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#AF7EFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 12 : 8}/>
           </>
         )
       })}
