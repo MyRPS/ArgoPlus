@@ -228,12 +228,30 @@ const QuickLinks = () => {
   return (
     <details open>
       <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Links<Divider /></summary>
-      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 30, fontSize: 12, borderRadius: 100, marginBottom: 5}} onClick={
-        () => {
-          window.open("https://rutgersprep.myschoolapp.com/app/student#login", "_blank").focus();
-        }}
-      >Argonet</button>
-      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 30, fontSize: 12, borderRadius: 100, marginBottom: 5}} onClick={
+      <table style={{width: "100%"}}>
+      <td>
+          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+            () => {
+              window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/assignment-center", "_blank").focus();
+            }}
+          >Assignment Calendar</button>
+        </td>
+        <td>
+          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+            () => {
+              window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/progress", "_blank").focus();
+            }}
+          >My Grades</button>
+        </td>
+        <td>
+          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+            () => {
+              window.open("https://rutgersprep.myschoolapp.com/app/student#calendar", "_blank").focus();
+            }}
+          >Master Calendar</button>
+        </td>
+      </table>
+      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
         () => {
           window.open("https://www.sagedining.com/sites/rutgerspreparatory/menu", "_blank").focus();
         }}
