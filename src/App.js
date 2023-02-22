@@ -14,11 +14,12 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 10, subTextSize = 6}) => {
+const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 12, subTextSize = 10}) => {
   return (
     <div style={{
       // border: headerSize != 8 ? "1px solid #353535" : "none",
-      backgroundColor: headerSize != 8 ? "#121212" : "#050505",
+      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      height: 50,
       borderRadius: 5, padding: 5, marginBottom: 5}}>
       <p style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
       {/* <Divider margin={5} /> */}
@@ -141,10 +142,10 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
           <>
             {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#7ee6ad", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
+                <p style={{color: "#FFF", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
               </>
             }
-            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#7ee6ad" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 14 : 8}/>
+            <DetailCards key={index} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#FFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 16 : 12}/>
           </>
         )
       })}
@@ -156,7 +157,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
       style={{
         border: "1px solid #707070",
         color: "#fff",
-        backgroundColor: "#292929",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
         fontSize: 12,
         borderRadius: 5,
       }}
@@ -169,7 +170,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
       style={{
         border: "1px solid #707070",
         color: "#fff",
-        backgroundColor: "#292929",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
         fontSize: 12,
         borderRadius: 5,
         paddingLeft: 5,
@@ -216,7 +217,7 @@ const Lunch = ({openByDefault}) => {
           return (
             <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
               <details key={index} open>
-                <summary style={{fontSize: 15, listStyle: "none", marginBottom: 5, color: "#7ee6ad"}}>{itemName}</summary>
+                <summary style={{fontSize: 15, listStyle: "none", marginBottom: 5, color: "#FFF"}}>{itemName}</summary>
                 <Divider />
                 {menuItems[itemName].map(item => <p style={{fontSize: 12}}>{item.name}</p>)}
               </details>
@@ -234,28 +235,33 @@ const QuickLinks = () => {
       <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Links<Divider /></summary>
       <table style={{width: "100%"}}>
       <td>
-          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
+          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/assignment-center", "_blank").focus();
             }}
           >Assignment Calendar</button>
-        </td>
-        <td>
-          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
+        {/* </td>
+        <td> */}
+          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/progress", "_blank").focus();
             }}
-          >My Grades</button>
-        </td>
-        <td>
-          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
+          >
+            <div style={{width: "100%", flexDirection: "row", flex: 1}}>
+              <p>My Grades</p>
+              <image src={require("./icons/arrow.png")} style={{height: 50, width: 50}} />
+            </div>
+          </button>
+        {/* </td>
+        <td> */}
+          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#calendar", "_blank").focus();
             }}
           >Master Calendar</button>
         </td>
       </table>
-      <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
+      <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
         () => {
           window.open("https://www.sagedining.com/sites/rutgerspreparatory/menu", "_blank").focus();
         }}
@@ -266,7 +272,9 @@ const QuickLinks = () => {
 
 function App() {
   return (
-    <div style={{width: "700px", height: "500px", padding: "25px", backgroundColor: "#000", color: "#fff", overflowY: "scroll", 
+    <div style={{width: "700px", height: "500px", padding: "25px", 
+    backgroundImage: "linear-gradient(to bottom right, #0a222b, #0a172b)"
+    , color: "#fff", overflowY: "scroll", 
     }}>
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
