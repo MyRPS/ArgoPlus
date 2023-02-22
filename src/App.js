@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import ICalParser from "ical-js-parser";
 
 const Divider = ({margin = 10, ...props}) => {
+  return <p style={{marginBottom: margin, marginTop: margin}} {...props}></p>;
   return (
     <div style={{width: "100%", height: "1px", backgroundColor: "#454545", marginBottom: margin}} {...props}>
     </div>
@@ -15,7 +16,10 @@ const Divider = ({margin = 10, ...props}) => {
 
 const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 10, subTextSize = 6}) => {
   return (
-    <div style={{border: "1px solid #353535", borderRadius: 5, padding: 5, marginBottom: 5}}>
+    <div style={{
+      // border: headerSize != 8 ? "1px solid #353535" : "none",
+      backgroundColor: headerSize != 8 ? "#121212" : "#050505",
+      borderRadius: 5, padding: 5, marginBottom: 5}}>
       <p style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
       {/* <Divider margin={5} /> */}
       <p style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, lineHeight: 1, color: headerColor}}>{header}</p>
@@ -137,10 +141,10 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
           <>
             {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#AF7EFF", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
+                <p style={{color: "#7ee6ad", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
               </>
             }
-            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#AF7EFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 12 : 8}/>
+            <DetailCards key={index} header={(timeString !== "" ? (timeString + " | ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#7ee6ad" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 14 : 8}/>
           </>
         )
       })}
@@ -212,7 +216,7 @@ const Lunch = ({openByDefault}) => {
           return (
             <div style={{border: "1px solid #454545", borderRadius: 5, padding: 5, marginBottom: 5}}>
               <details key={index} open>
-                <summary style={{fontSize: 15, listStyle: "none", marginBottom: 5, color: "#AF7EFF"}}>{itemName}</summary>
+                <summary style={{fontSize: 15, listStyle: "none", marginBottom: 5, color: "#7ee6ad"}}>{itemName}</summary>
                 <Divider />
                 {menuItems[itemName].map(item => <p style={{fontSize: 12}}>{item.name}</p>)}
               </details>
@@ -230,28 +234,28 @@ const QuickLinks = () => {
       <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Links<Divider /></summary>
       <table style={{width: "100%"}}>
       <td>
-          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/assignment-center", "_blank").focus();
             }}
           >Assignment Calendar</button>
         </td>
         <td>
-          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/progress", "_blank").focus();
             }}
           >My Grades</button>
         </td>
         <td>
-          <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+          <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
             () => {
               window.open("https://rutgersprep.myschoolapp.com/app/student#calendar", "_blank").focus();
             }}
           >Master Calendar</button>
         </td>
       </table>
-      <button style={{color: "#fff", backgroundColor: "#373737", width:"100%", height: 25, fontSize: 8, borderRadius: 100, marginBottom: 5}} onClick={
+      <button style={{color: "#000", backgroundColor: "#7ee6ad", width:"100%", height: 25, fontSize: 8, borderRadius: 7, marginBottom: 5}} onClick={
         () => {
           window.open("https://www.sagedining.com/sites/rutgerspreparatory/menu", "_blank").focus();
         }}
@@ -270,11 +274,11 @@ function App() {
       <table style={{border: "none"}}>
         <tr>
           <td style={{width: "40%", verticalAlign: "top"}}>
-            <ICalDetails title={"My Schedule"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
+            <ICalDetails title={"Schedule"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
             <QuickLinks />
           </td>
           <td style={{width: "60%", verticalAlign: "top"}}>
-            <ICalDetails title={"My Assignments"} idx={1} ADaysLimit={-1} openByDefault/>
+            <ICalDetails title={"Due Soon"} idx={1} ADaysLimit={-1} openByDefault/>
           </td>
         </tr>
       </table>
