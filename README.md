@@ -37,7 +37,7 @@ Legality statement: I've been questioned multiple times on this. Nothing about t
 
 ## ArgoTray:
 
-![image](https://user-images.githubusercontent.com/50122069/220810671-ce00148a-4752-4a37-946d-b26ca0dd9264.png)
+![image](https://user-images.githubusercontent.com/50122069/220950016-092c223f-28d9-4b2c-a2fa-9969ed1cbff7.png)
 * Check your schedule, assignment, and lunch anywhere on Chrome at the click of a button. 
 * No signin required, no hassle needed. 
 
