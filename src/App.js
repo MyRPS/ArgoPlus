@@ -14,7 +14,13 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = "", backgroundImage = "none", headerColor = "#fff", subTextColor = "#fff", headerSize = 12, subTextSize = 10}) => {
+const AssignmentDetailCards = ({header = "", backgroundImage = "none", headerColor = "#fff", headerSize = 12}) => {
+
+  let pills = header.includes(": ") || true;
+
+  const className = header.split(": ")[0].split(" - ")[0];
+  const teacher = header.split(": ")[0].split(" - ")[1];
+
   return (
     <div style={{
       backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -22,7 +28,68 @@ const DetailCards = ({header = "", subText = "", backgroundImage = "none", heade
       width: "100%",
       borderRadius: 5, padding: 15, marginBottom: 5, flex: 1}}> 
       {/* <span style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</span> */}
-      <span style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, color: headerColor}}>{header}</span>
+      <span style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, color: headerColor}}>{pills ? header.split(": ")[1] : header}</span>
+      {pills &&
+        <div style={{position: "relative", width: "100%", flexDirection: "row", flex: 1}}>
+          {/* <div style={{position: "relative", width: "100%", flexDirection: "row", flex: 1}}> */}
+            <span style={{fontSize: 7, lineHeight: 1, color: "white", padding: 5, marginRight: 5, paddingLeft: 10, paddingRight: 10, backgroundColor: "rgba(0, 0, 0, 0.25)", borderRadius: 10}}>
+            <img src={require("./icons/course.png")} style={{width: 10, height: 10, marginRight: 5, marginTop: -2}}/>
+              {className}
+            </span>
+          {/* </div> */}
+          <span style={{fontSize: 7, lineHeight: 1, color: "white", padding: 5, marginRight: 5, paddingLeft: 10, paddingRight: 10, backgroundColor: "rgba(0, 0, 0, 0.25)", borderRadius: 10}}>
+          <img src={require("./icons/person.png")} style={{width: 10, height: 10, marginRight: 5, marginTop: -2}}/>
+            {teacher}
+          </span>
+        </div>
+        }
+    </div>
+  );
+}
+
+const ScheduleDetailCards = ({header = "", backgroundImage = "none", headerColor = "#fff", headerSize = 12}) => {
+
+  //9:50AM Study Hall - Hussian (6)
+
+  let useHeaderOnly = false;
+  let periodNumber;
+  let teacher;
+  let className;
+  let time;
+  try {
+    periodNumber = header.split(" - ")[1].split(" ")[1].replace("(", "").replace(")", "");
+    teacher = header.split(" - ")[1].split(" ")[0];
+    className = header.split(" - ")[0].split(" ").slice(1).join(" ");
+    time = header.split(" ")[0];
+  } catch (e) {
+    useHeaderOnly = true;
+  }
+
+  return (
+    <div style={{
+      backgroundColor: "rgba(255, 255, 255, 0.15)",
+      backgroundImage: backgroundImage,
+      width: "100%",
+      borderRadius: 5, padding: 15, marginBottom: 5, flex: 1}}> 
+      {/* <span style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</span> */}
+      <span style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, color: headerColor}}>{useHeaderOnly ? header : (className)}</span>
+        {!useHeaderOnly && <div style={{position: "relative", width: "100%", flexDirection: "row", flex: 1}}>
+          {/* <div style={{position: "relative", width: "100%", flexDirection: "row", flex: 1}}> */}
+            <span style={{fontSize: 7, lineHeight: 1, color: "white", padding: 5, marginRight: 5, paddingLeft: 10, paddingRight: 10, backgroundColor: "rgba(0, 0, 0, 0.25)", borderRadius: 10}}>
+            <img src={require("./icons/clock.png")} style={{width: 10, height: 10, marginRight: 5, marginTop: -2}}/>
+              {time}
+            </span>
+          {/* </div> */}
+          <span style={{fontSize: 7, lineHeight: 1, color: "white", padding: 5, marginRight: 5, paddingLeft: 10, paddingRight: 10, backgroundColor: "rgba(0, 0, 0, 0.25)", borderRadius: 10}}>
+          <img src={require("./icons/person.png")} style={{width: 10, height: 10, marginRight: 5, marginTop: -2}}/>
+            {teacher}
+          </span>
+          <span style={{fontSize: 7, lineHeight: 1, color: "white", padding: 5, marginRight: 5, paddingLeft: 10, paddingRight: 10, backgroundColor: "rgba(0, 0, 0, 0.25)", borderRadius: 10}}>
+          <img src={require("./icons/hash.png")} style={{width: 10, height: 10, marginRight: 5, marginTop: -2}}/>
+            {periodNumber}
+          </span>
+        </div>
+        }
     </div>
   );
 }
@@ -151,7 +218,11 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
                 <p style={{color: "#FFF", marginTop: 15, marginBottom: 5, fontSize: 16}}>{dayOfWeek}, {eventDateOnly.replace("-", "/")} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} Days)`}</p>
               </>
             }
-            <DetailCards key={index} backgroundImage={index === 0 && daysLimit === 1 ? "linear-gradient(to bottom right, #5081f2, #50f2b1)" : "none"} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#fff" : "#fff"} headerSize={12}/>
+            {daysLimit !== 1 ? 
+              <AssignmentDetailCards key={index} backgroundImage={"none"} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#fff" : "#fff"} headerSize={12}/>
+              :
+              <ScheduleDetailCards key={index} backgroundImage={index === 0 ? "linear-gradient(to bottom right, #6d5ced, #5c96ed)" : "none"} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#fff" : "#fff"} headerSize={12}/>
+            }
           </>
         )
       })}
