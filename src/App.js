@@ -14,16 +14,15 @@ const Divider = ({margin = 10, ...props}) => {
   )
 }
 
-const DetailCards = ({header = "", subText = "", headerColor = "#fff", subTextColor = "#fff", headerSize = 12, subTextSize = 10}) => {
+const DetailCards = ({header = "", subText = "", backgroundImage = "none", headerColor = "#fff", subTextColor = "#fff", headerSize = 12, subTextSize = 10}) => {
   return (
     <div style={{
-      // border: headerSize != 8 ? "1px solid #353535" : "none",
-      backgroundColor: "rgba(255, 255, 255, 0.05)",
-      height: 50,
-      borderRadius: 5, padding: 5, marginBottom: 5}}>
-      <p style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</p>
-      {/* <Divider margin={5} /> */}
-      <p style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, lineHeight: 1, color: headerColor}}>{header}</p>
+      backgroundColor: "rgba(255, 255, 255, 0.15)",
+      backgroundImage: backgroundImage,
+      width: "100%",
+      borderRadius: 5, padding: 15, marginBottom: 5, flex: 1}}> 
+      {/* <span style={{fontSize: subTextSize, lineHeight: 1, textAlign: "left", paddingLeft: 0, marginBottom: header != "" ? 7 : 0, color: subTextColor}}>{subText}</span> */}
+      <span style={{fontSize: headerSize, marginBottom: header != "" ? 5 : 0, color: headerColor}}>{header}</span>
     </div>
   );
 }
@@ -39,7 +38,7 @@ const formatBadISO = (badISO) => {
 }
 
 
-const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefault = false, useDateStart = false}) => {
+const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefault = false, useDateStart = false, margin=false}) => {
   const [iCal, setiCal] = useState([]);
   const [daysLimit, setDaysLimit] = useState(ADaysLimit);
 
@@ -109,7 +108,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
 
   return (
   <>
-    <details open={openByDefault}>
+    <details open={openByDefault} style={{marginLeft: margin ? 25 : 0}}>
     <summary style={{fontSize: 26, fontWeight: "", listStyle: "none"}}>{title}<Divider /></summary>
       {iCal && iCal.map((event, index) => {
 
@@ -118,7 +117,7 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
 
         const days = eventDate - now;
 
-        const eventDateOnly = formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[0];
+        let eventDateOnly = formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).split("T")[0];
         let timeString = "";
 
         if (formatBadISO(event[useDateStart ? "dtstart" : "dtend"].value).includes("T"))
@@ -138,44 +137,59 @@ const ICalDetails = ({title, idx, ADaysLimit = -1, incrementBy = 1, openByDefaul
 
         const dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(eventDate).getDay()];
 
+        eventDateOnly = eventDateOnly.replace(new Date().getFullYear() + "-", "").replace("-", "/");
+
+        // if (!eventDate.includes("-"))
+        // {
+        //   eventDate = eventDate + "th";
+        // }
+
         return (
           <>
             {diff && daysLimit !== 1 &&
               <>
-                <p style={{color: "#FFF", marginTop: 5, marginBottom: 5, fontSize: 12}}>{dayOfWeek}, {eventDateOnly} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} days)`}</p>
+                <p style={{color: "#FFF", marginTop: 15, marginBottom: 5, fontSize: 16}}>{dayOfWeek}, {eventDateOnly.replace("-", "/")} {`(In ${Math.ceil(days / (1000 * 60 * 60 * 24))} Days)`}</p>
               </>
             }
-            <DetailCards key={index} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#FFF" : "#fff"} subTextColor="#fff" headerSize={index === 0 && daysLimit === 1 ? 16 : 12}/>
+            <DetailCards key={index} backgroundImage={index === 0 && daysLimit === 1 ? "linear-gradient(to bottom right, #5081f2, #50f2b1)" : "none"} header={(timeString !== "" ? (timeString + " \n ") : "") + event.summary} headerColor={index === 0 && daysLimit === 1 ? "#fff" : "#fff"} headerSize={12}/>
           </>
         )
       })}
-      {daysLimit != -1 && incrementBy != 0 && <button onClick={
-        () => {
-          setDaysLimit(daysLimit + incrementBy);
-        }
-      }
-      style={{
-        border: "1px solid #707070",
-        color: "#fff",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        fontSize: 12,
-        borderRadius: 5,
-      }}
-      >Load Next</button>}
       {daysLimit > incrementBy && daysLimit != -1 &&  incrementBy != 0 && <button onClick={
         () => {
           setDaysLimit(daysLimit - incrementBy);
         }
       }
       style={{
-        border: "1px solid #707070",
+        border: "none",
         color: "#fff",
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
         fontSize: 12,
         borderRadius: 5,
-        paddingLeft: 5,
+        padding: 5,
+        marginTop: 15,
+        paddingLeft: 15,
+        paddingRight: 15,
+        marginRight: 15,
       }}
-      >Hide Last</button>}
+      >{"Hide Last " + incrementBy}</button>}
+      {daysLimit != -1 && incrementBy != 0 && <button onClick={
+        () => {
+          setDaysLimit(daysLimit + incrementBy);
+        }
+      }
+      style={{
+        border: "none",
+        color: "#fff",
+        backgroundColor: "rgba(255, 255, 255, 0.15)",
+        fontSize: 12,
+        borderRadius: 5,
+        padding: 5,
+        marginTop: 15,
+        paddingLeft: 15,
+        paddingRight: 15
+      }}
+      >{"Load " + incrementBy + " More"}</button>}
       {
         !iCal && <p style={{color: "#fff", fontSize: 12}}>Error fetching events. Perhaps our service expired? If so, please try logging into Argonet again.</p>
       }
@@ -229,52 +243,38 @@ const Lunch = ({openByDefault}) => {
   );
 }
 
+const QuickLinkButton = ({icon, text, link}) => {
+  return (
+    <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.15)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
+      () => {
+        window.open(link, "_blank").focus();
+      }}
+    >
+      <div style={{position: "relative", width: "100%", flexDirection: "row", flex: 1}}>
+        <img src={icon} style={{width: 15, height: 15, marginLeft: 15, marginRight: 15}} />
+        <span>{text}</span>
+        <img src={require("./icons/arrow.png")} style={{position: "absolute", width: 15, height: 15, right: 15, alignSelf: "right"}} />
+      </div>
+    </button>
+  )
+}
+
 const QuickLinks = () => {
   return (
     <details open>
-      <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Links<Divider /></summary>
-      <table style={{width: "100%"}}>
-      <td>
-          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
-            () => {
-              window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/assignment-center", "_blank").focus();
-            }}
-          >Assignment Calendar</button>
-        {/* </td>
-        <td> */}
-          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
-            () => {
-              window.open("https://rutgersprep.myschoolapp.com/app/student#studentmyday/progress", "_blank").focus();
-            }}
-          >
-            <div style={{width: "100%", flexDirection: "row", flex: 1}}>
-              <p>My Grades</p>
-              <image src={require("./icons/arrow.png")} style={{height: 50, width: 50}} />
-            </div>
-          </button>
-        {/* </td>
-        <td> */}
-          <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
-            () => {
-              window.open("https://rutgersprep.myschoolapp.com/app/student#calendar", "_blank").focus();
-            }}
-          >Master Calendar</button>
-        </td>
-      </table>
-      <button style={{border: "none", textAlign: "left", color: "#fff", backgroundColor: "rgba(255, 255, 255, 0.05)", width:"100%", height: 50, fontSize: 12, borderRadius: 7, marginBottom: 5}} onClick={
-        () => {
-          window.open("https://www.sagedining.com/sites/rutgerspreparatory/menu", "_blank").focus();
-        }}
-      >Lunch Menu</button>
+      <summary style={{fontSize: 26, fontWeight: "", listStyle: "none", color: "#fff"}}>Quick Access<Divider /></summary>
+        <QuickLinkButton icon={require("./icons/food.png")} text="Lunch Menu" link="https://www.sagedining.com/sites/rutgerspreparatory/menu"/>
+        <QuickLinkButton icon={require("./icons/calendar.png")} text="Assignment Calendar" link="https://rutgersprep.myschoolapp.com/app/student#studentmyday/assignment-center"/>
+        <QuickLinkButton icon={require("./icons/grades.png")} text="My Grades" link="https://rutgersprep.myschoolapp.com/app/student#studentmyday/progress"/>
     </details>
   );
 }
 
 function App() {
   return (
-    <div style={{width: "700px", height: "500px", padding: "25px", 
+    <div style={{width: "800px", height: "800px", padding: "25px", 
     backgroundImage: "linear-gradient(to bottom right, #0a222b, #0a172b)"
-    , color: "#fff", overflowY: "scroll", 
+    , color: "#fff", 
     }}>
       {/* <h1>Dashboard</h1> */}
       {/* <Divider /> */}
@@ -282,11 +282,11 @@ function App() {
       <table style={{border: "none"}}>
         <tr>
           <td style={{width: "40%", verticalAlign: "top"}}>
-            <ICalDetails title={"Schedule"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
+            <ICalDetails title={"Next Up"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
             <QuickLinks />
           </td>
           <td style={{width: "60%", verticalAlign: "top"}}>
-            <ICalDetails title={"Due Soon"} idx={1} ADaysLimit={-1} openByDefault/>
+            <ICalDetails margin title={"Due Soon"} idx={1} ADaysLimit={10} incrementBy={10} openByDefault/>
           </td>
         </tr>
       </table>
