@@ -343,7 +343,7 @@ const QuickLinks = () => {
 
 function App() {
   return (
-    <div style={{width: "800px", height: "800px", padding: "25px", 
+    <div style={{width: "600px", height: "800px", padding: "25px", 
     backgroundImage: "linear-gradient(to bottom right, #0a222b, #0a172b)"
     , color: "#fff", 
     }}>
@@ -352,11 +352,11 @@ function App() {
       {/* <p>School day's over, what you see is for tomorrow. <a href={""} style={{fontSize: 12}}>See today.</a></p> */}
       <table style={{border: "none"}}>
         <tr>
-          <td style={{width: "40%", verticalAlign: "top"}}>
+          <td style={{width: "50%", verticalAlign: "top"}}>
             <ICalDetails title={"Next Up"} idx={2} ADaysLimit={1} incrementBy={0} openByDefault useDateStart/>
             <QuickLinks />
           </td>
-          <td style={{width: "60%", verticalAlign: "top"}}>
+          <td style={{width: "50%", verticalAlign: "top"}}>
             <ICalDetails margin title={"Due Soon"} idx={1} ADaysLimit={10} incrementBy={10} openByDefault/>
           </td>
         </tr>
